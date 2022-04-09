@@ -1,5 +1,6 @@
 package com.huqz.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.huqz.core.Result;
 import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.List;
 
@@ -97,8 +99,14 @@ public class ImageController {
     }
 
     @GetMapping("/list")
-    public void list(@RequestBody PageDTO pageDTO) {
+    public Result list(@RequestBody PageDTO pageDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
 
+        Integer userId = principal.getId();
+
+        IPage<Image> page = imageService.getPageByAnyCondition(pageDTO, userId);
+        return ResultGenerator.ok(page);
     }
 
     @PostMapping("/del")

@@ -1,0 +1,38 @@
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<!--<!DOCTYPE mapper-->
+<!--        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"-->
+<!--        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+<mapper>
+
+    <resultMap id="imageResultMap" type="com.huqz.model.Image">
+        <result property="userId" column="user_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="thumbUrn" column="thumb_urn"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!--
+        0.自己上传的图片
+        1.标签查找
+        2.分类查找
+    -->
+    <select id="selectPageAnyCondition" resultType="com.huqz.model.Image" resultMap="imageResultMap">
+        select * from image
+        inner join image_tags
+        on image.id = image_tags.img_id
+        <if test="page.tag != null and page.tag != ''">
+            and image_tags.tag_id = (
+            select id from tag where tag.tag_name = #{page.tag}
+            )
+        </if>
+        <where>
+            image.user_id = #{userId}
+
+            <if test="page.categoryId != null">
+                and image.category_id = #{page.categoryId}
+            </if>
+        </where>
+
+        limit #{page.pageNumber}, #{page.pageSize}
+    </select>
+</mapper>

@@ -10,10 +10,9 @@ import javax.validation.constraints.NotEmpty;
 public class PageDTO {
 
     @NotEmpty
-    private String pageSize;
+    private Integer pageSize;
     @NotEmpty
-    private String pageNumber;
-    @NotEmpty
+    private Integer pageNumber;
     private Integer categoryId;
     private String tag;
 }
