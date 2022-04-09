@@ -1,0 +1,46 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql:///security?useUnicode=true&characterEncoding=utf8
+      username: root
+      password: root
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 15m
+      use-key-prefix: true
+      cache-null-values: true
+      key-prefix: imgs_
+  redis:
+    port: 6379
+    host: localhost
+  mail:
+    host: smtp.qq.com
+    username: awsl.simple@qq.com
+    password: tciqnmxijcladhea
+    #    port: 465
+
+  thymeleaf:
+    mode: HTML
+    cache: false
+    #    prefix: classpath:/templates/mail/
+    suffix: .html
+  #    servlet:
+  #      content-type: text/html
+  #    check-template-location: true
+
+  jackson:
+    default-property-inclusion: non_null  # 返回前端json时，若参数为null则不显示
+  mvc:
+    static-path-pattern: /static/**   # 静态资源请求路径
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+

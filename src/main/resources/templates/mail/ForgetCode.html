@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>userInfo</title>
+    <style type="text/css">
+        table td {
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: "Microsoft YaHei", Arial, Verdana;
+        }
+
+        p, span {
+            font-family: "Microsoft YaHei", Arial, Verdana;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            display: inline-block;
+        }
+    </style>
+
+</head>
+<body>
+
+<div>
+</div>
+<table style="border-collapse: collapse; background-color: #f1f1f1" width="100%" cellspacing="0" cellpadding="0"
+       border="0" align="center">
+    <tbody>
+    <tr>
+        <td style="padding-top: 47px; padding-bottom: 20px;">
+            <table style="border-collapse: collapse; background-color: #ffffff;" width="600" cellspacing="0"
+                   cellpadding="0" border="0" align="center">
+                <tbody>
+                <tr>
+                    <td style="padding: 18px 45px 1px 45px; text-align: left;">
+                        <hr style="border: none; border-bottom: 1px solid #f1f3f2; height: 1px;">
+                        <p style="margin-top: 42px; margin-bottom: 6px; font-size: 14px; color: #0a0a0a;">亲爱的 <span
+                                style="color: red;" th:text="${username}"></span>：</p>
+                        <p style="margin-bottom: 20px; line-height: 24px; font-size: 14px; color: #0a0a0a;">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;你正在找回密码。
+                        </p>
+                        <table style="border-collapse: collapse;" width="100%" cellspacing="0" cellpadding="0"
+                               border="0">
+                            <tbody>
+                            <tr>
+                                <td style="border: 3px solid #3794dd; padding: 15px 30px 15px 30px; position: relative;">
+                                    <p style="color: #3794dd; margin-bottom: 28px; display: block; text-align: center; font-size: 18px; font-weight: bold;">
+                                        验证码</p>
+                                    <table style="width: 100%; line-height: 20px; border-left: 1px solid #daedfb; margin-bottom: 10px; color: #5e5e5e; font-size: 12px; border-top: 1px solid #daedfb;text-align: center"
+                                           cellspacing="0" cellpadding="0" border="0">
+                                        <tbody>
+                                        <tr style="background-color: #daedfb;">
+                                            <th style="padding: 7px 5px; width: 30%; font-weight: normal; mso-line-height-rule: exactly;">
+                                                账号
+                                            </th>
+                                            <th style="padding: 7px 5px; width: 35%; font-weight: normal; mso-line-height-rule: exactly;">
+                                                验证码
+                                            </th>
+                                            <th style="padding: 7px 5px; width: 35%; font-weight: normal; mso-line-height-rule: exactly;">
+                                                有效时间
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td
+                                                style="border-bottom: 1px solid #daedfb; border-right: 1px solid #daedfb; padding: 12px 5px; mso-line-height-rule: exactly;"
+                                                th:text="${username}"
+                                            ></td>
+                                            <td
+                                                style="border-bottom: 1px solid #daedfb; border-right: 1px solid #daedfb; padding: 12px 5px; mso-line-height-rule: exactly;"
+                                                th:text="${mailCode}"
+                                            ></td>
+                                            <td style="border-bottom: 1px solid #daedfb; border-right: 1px solid #daedfb; padding: 12px 5px; mso-line-height-rule: exactly;">
+                                                15分钟
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <center>
+                            <p>为了你的个人隐私安全，请勿上传敏感信息。</p></center>
+                        <p style="margin-bottom: 20px; margin-top: 15px; line-height: 24px; font-size: 14px; color: #0a0a0a;">
+                        <center>邮件由系统自动发送，请勿回复。</center>
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 12px; color: #b1b1b1; text-align: center; margin-bottom: 34px; padding-top: 20px;">
+                © Copyright (C) 2018-2021 , All rights reserved .</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
+
+</body>
+</html>
