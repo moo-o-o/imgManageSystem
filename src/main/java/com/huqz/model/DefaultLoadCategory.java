@@ -10,4 +10,5 @@ public class DefaultLoadCategory {
     private Integer userId;
     private Integer categoryId;
     private Timestamp createTime;
+    private Timestamp updateTime;
 }

@@ -3,10 +3,12 @@ package com.huqz.exception;
 import com.huqz.core.Result;
 import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -56,5 +58,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileTypeException.class)
     public Result FileTypeException(FileTypeException fileTypeException) {
         return ResultGenerator.fail(ResultCode.INVALID_FILE_SUFFIX, "无效的文件");
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public Result MissingServletRequestParameterException(MissingServletRequestParameterException missingServletRequestParameterException) {
+        missingServletRequestParameterException.printStackTrace();
+        return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数不合法");
+    }
+
+    /**
+     * 接受json数据格式时，没有json数据或者数据在解析时类型不一致导致的错误
+     * @param httpMessageNotReadableException ;
+     * @return Result
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result HttpMessageNotReadableException(HttpMessageNotReadableException httpMessageNotReadableException) {
+        httpMessageNotReadableException.printStackTrace();
+        return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数不合法");
     }
 }
