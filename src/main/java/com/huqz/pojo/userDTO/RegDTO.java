@@ -1,4 +1,4 @@
-package com.huqz.pojo.dto;
+package com.huqz.pojo.userDTO;
 
 import lombok.Data;
 

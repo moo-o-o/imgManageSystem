@@ -1,6 +1,6 @@
 package com.huqz.service.impl;
 
-import com.huqz.pojo.dto.MailDTO;
+import com.huqz.pojo.userDTO.MailDTO;
 import com.huqz.service.CodeService;
 import com.huqz.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;

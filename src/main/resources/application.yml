@@ -34,9 +34,9 @@ spring:
   #    check-template-location: true
 
   jackson:
-    default-property-inclusion: non_null  # ·µ»ØÇ°¶ËjsonÊ±£¬Èô²ÎÊıÎªnullÔò²»ÏÔÊ¾
+    default-property-inclusion: non_null  # è¿”å›å‰ç«¯jsonæ—¶ï¼Œè‹¥å‚æ•°ä¸ºnullåˆ™ä¸æ˜¾ç¤º
   mvc:
-    static-path-pattern: /static/**   # ¾²Ì¬×ÊÔ´ÇëÇóÂ·¾¶
+    static-path-pattern: /static/**   # é™æ€èµ„æºè¯·æ±‚è·¯å¾„
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -44,3 +44,7 @@ mybatis-plus:
     db-config:
       id-type: auto
 
+imgs:
+  upload:
+    tags:
+      maxNum: 3

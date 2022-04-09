@@ -2,16 +2,17 @@ package com.huqz.model;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @Data
 public class Image {
     private Integer id;
-    private String userId;
+    private Integer userId;
     private String url;
     private String urn;
     private String thumbUrn;
-    private String categoryId;
-    private String tags;
+    private Integer categoryId;
     private String status;
     private String confirm;
-    private String createTime;
+    private Timestamp createTime;
 }

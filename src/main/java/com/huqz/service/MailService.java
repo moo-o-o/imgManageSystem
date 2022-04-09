@@ -1,6 +1,6 @@
 package com.huqz.service;
 
-import com.huqz.pojo.dto.MailDTO;
+import com.huqz.pojo.userDTO.MailDTO;
 
 import javax.mail.MessagingException;
 

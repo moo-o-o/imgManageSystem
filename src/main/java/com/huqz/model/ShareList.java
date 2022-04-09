@@ -2,12 +2,14 @@ package com.huqz.model;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @Data
 public class ShareList {
     private Integer id;
-    private String userId;
+    private Integer userId;
     private Boolean type;
     private String status;
-    private String categoryId;
-    private String createTime;
+    private Integer categoryId;
+    private Timestamp createTime;
 }

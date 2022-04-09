@@ -52,4 +52,9 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResultGenerator.fail(ResultCode.INTERNAL_SERVER_ERROR, "服务器内部错误");
     }
+
+    @ExceptionHandler(FileTypeException.class)
+    public Result FileTypeException(FileTypeException fileTypeException) {
+        return ResultGenerator.fail(ResultCode.INVALID_FILE_SUFFIX, "无效的文件");
+    }
 }

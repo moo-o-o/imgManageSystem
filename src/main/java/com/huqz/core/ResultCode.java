@@ -29,7 +29,9 @@ public enum ResultCode {
     NOT_EXISTED_ANY_IMG(1018),        // 该分类下无任何图片
     INVALID_SHARE_ID(1019),           // 无效的请求分享ID
     EXPIRED_SHARE(1020),              // 该分享已失效
-    REPEAT_CONFIRMED(1021);           // 重复申请恢复图片访问
+    REPEAT_CONFIRMED(1021),           // 重复申请恢复图片访问
+    INVALID_FILE(1022),               // 无效的文件
+    INVALID_FILE_SUFFIX(1023);        // 无效的文件后缀
 
 
 

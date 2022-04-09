@@ -1,8 +1,6 @@
 package com.huqz.service.impl;
 
-import com.huqz.pojo.dto.CodeDTO;
-import com.huqz.pojo.dto.MailDTO;
-import com.huqz.pojo.dto.UserCodeDTO;
+import com.huqz.pojo.userDTO.MailDTO;
 import com.huqz.exception.MailCodeException;
 import com.huqz.service.CacheService;
 import org.springframework.cache.annotation.CacheEvict;

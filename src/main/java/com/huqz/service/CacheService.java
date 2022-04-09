@@ -1,8 +1,7 @@
 package com.huqz.service;
 
 import com.huqz.exception.MailCodeException;
-import com.huqz.pojo.dto.CodeDTO;
-import com.huqz.pojo.dto.MailDTO;
+import com.huqz.pojo.userDTO.MailDTO;
 
 public interface CacheService {
 
