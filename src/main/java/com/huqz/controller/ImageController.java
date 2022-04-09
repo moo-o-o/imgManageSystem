@@ -6,6 +6,7 @@ import com.huqz.core.ResultGenerator;
 import com.huqz.exception.FileTypeException;
 import com.huqz.model.*;
 import com.huqz.pojo.imgDTO.FileDTO;
+import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.pojo.imgDTO.UploadDTO;
 import com.huqz.service.CategoryService;
 import com.huqz.service.ImageService;
@@ -78,9 +79,15 @@ public class ImageController {
         // 处理标签 (根据maxNum来限制传递个数)
         List<String> tags = uploadDTO.getTags();
         for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
-            Tag tag = new Tag().setTagName(tags.get(i));
-            tagService.save(tag);                    // 上传标签
-            imageTagsService.save(                   // 关联图片和标签
+            // 查询是否已经有该标签
+            Tag tag = tagService.getByTagName(tags.get(i));
+            // 没有标签则先存入
+            if (tag == null) {
+                tag = new Tag().setTagName(tags.get(i));
+                tagService.save(tag);// 上传标签
+            }
+            // 关联图片和标签
+            imageTagsService.save(
                     new ImageTags().setImgId(image.getId())
                             .setTagId(tag.getId())
             );
@@ -90,7 +97,7 @@ public class ImageController {
     }
 
     @GetMapping("/list")
-    public void list() {
+    public void list(@RequestBody PageDTO pageDTO) {
 
     }
 
