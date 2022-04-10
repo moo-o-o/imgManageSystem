@@ -6,13 +6,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.huqz.mapper.ImageMapper;
 import com.huqz.model.Image;
+import com.huqz.model.ImageTags;
 import com.huqz.model.Tag;
+import com.huqz.pojo.ImageVO;
 import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.service.ImageService;
 import com.huqz.service.ImageTagsService;
 import com.huqz.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements ImageService {
@@ -64,12 +68,23 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         if (tag != null) {
             tagId = tag.getId();
         }
-
         lqw.inSql(tag != null, Image::getId, "select img_id from image_tags where tag_id = " + tagId);
 
 
         IPage<Image> page = new Page<>(pageDTO.getPageNumber(), pageDTO.getPageSize());
         imageMapper.selectPage(page, lqw);
+        List<Image> records = page.getRecords();
+        for (Image record : records) {
+            ImageVO imageVO = new ImageVO(record);
+            Integer imgId = record.getId();
+            List<Integer> tagIds = imageTagsService.getTagIdByImgId(imgId);
+            for (Integer id : tagIds) {
+                String tagName = tagService.getTagNameByTagId(id);
+                imageVO.getTags().add(tagName);
+            }
+        }
+
+        System.out.println(page.getRecords());
 
         return page;
     }

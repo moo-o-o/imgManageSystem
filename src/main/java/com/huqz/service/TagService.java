@@ -9,4 +9,6 @@ import org.springframework.stereotype.Service;
 public interface TagService extends IService<Tag> {
 
     Tag getByTagName(String tagName);
+
+    String getTagNameByTagId(Integer tagId);
 }

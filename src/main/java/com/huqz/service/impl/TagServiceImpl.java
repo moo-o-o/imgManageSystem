@@ -14,6 +14,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     private TagMapper tagMapper;
 
     @Override
+    public String getTagNameByTagId(Integer tagId) {
+        return tagMapper.selectTagNameById(tagId);
+    }
+
+    @Override
     public Tag getByTagName(String tagName) {
         return tagMapper.selectByTagName(tagName);
     }
