@@ -7,6 +7,8 @@ import com.huqz.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
@@ -14,8 +16,13 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     private TagMapper tagMapper;
 
     @Override
-    public String getTagNameByTagId(Integer tagId) {
-        return tagMapper.selectTagNameById(tagId);
+    public List<String> getTagsByImgId(Integer imgId) {
+        return tagMapper.selectTagsByImgId(imgId);
+    }
+
+    @Override
+    public Integer getIdByTagName(String tagName) {
+        return tagMapper.selectIdByTagName(tagName);
     }
 
     @Override
