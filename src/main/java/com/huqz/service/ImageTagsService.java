@@ -8,4 +8,8 @@ import java.util.List;
 public interface ImageTagsService extends IService<ImageTags> {
 
     List<Integer> getTagIdByImgId(Integer imgId);
+
+    Integer getByTagIdAndImgId(Integer tagId, Integer imgId);
+
+    Boolean removeAllTagsByImgId(Integer imgId);
 }

@@ -8,6 +8,7 @@ import com.huqz.exception.FileTypeException;
 import com.huqz.model.*;
 import com.huqz.pojo.imgDTO.FileDTO;
 import com.huqz.pojo.imgDTO.PageDTO;
+import com.huqz.pojo.imgDTO.UpdateDTO;
 import com.huqz.pojo.imgDTO.UploadDTO;
 import com.huqz.service.CategoryService;
 import com.huqz.service.ImageService;
@@ -18,6 +19,7 @@ import com.huqz.utils.ImageUtils;
 import com.huqz.utils.UrnUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/imgs")
@@ -47,7 +54,10 @@ public class ImageController {
     @Value("${imgs.upload.tags.maxNum}")
     private Integer tagMaxNum;
 
-    @PostMapping("/upload")
+    @Value("${imgs.view.notFound}")
+    private String notFoundImage;
+
+    @PostMapping
     public Result upload(UploadDTO uploadDTO, @RequestParam("file") MultipartFile file) throws FileTypeException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!authentication.isAuthenticated()) {
@@ -98,7 +108,7 @@ public class ImageController {
         return ResultGenerator.ok();
     }
 
-    @GetMapping("/list")
+    @GetMapping
     public Result list(@RequestBody PageDTO pageDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
@@ -109,13 +119,62 @@ public class ImageController {
         return ResultGenerator.ok(page);
     }
 
-    @PostMapping("/del")
-    public void del() {
+    @DeleteMapping
+    public Result del(@RequestBody Map<String, Integer> map) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
 
+        Integer userId = principal.getId();
+        Integer imgId = map.get("id");
+        if (imgId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
+
+        Image image = imageService.getByImgIdAndUserId(imgId, userId);
+        // 存在该图片，则删除
+        if (image != null) imageService.removeById(imgId);
+        return ResultGenerator.ok();
     }
 
-    @PostMapping("/update")
-    public void update() {
+    @PutMapping
+    public Result update(@RequestBody UpdateDTO updateDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+        Integer categoryId = updateDTO.getCategoryId();
+        Integer imgId = updateDTO.getImgId();
+        List<String> tags = updateDTO.getTags();
+
+        // 该用户是否存在该图片
+        Image image = imageService.getByImgIdAndUserId(imgId, userId);
+        if (image == null) return ResultGenerator.fail(ResultCode.UNKNOWN_IMG_ID, "无效的图片ID");
+
+        // 该用户是否存在该分类
+        Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
+        if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "不存在的分类");
+        // 不管分类是否发生改变，都执行更新
+        imageService.updateCategoryByImgIdAndUserId(imgId, userId, categoryId);
+
+        if (tags == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
+
+        // 解绑imgId的所有标签
+        imageTagsService.removeAllTagsByImgId(imgId);
+
+        // 处理标签
+        for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
+
+            Tag tag = tagService.getByTagName(tags.get(i));
+            // 新标签则添加
+            if (tag == null) {
+                tag = new Tag().setTagName(tags.get(i));
+                tagService.save(tag);
+            }
+            // 关联图片和标签
+            imageTagsService.save(
+                    new ImageTags().setImgId(imgId).setTagId(tag.getId())
+            );
+        }
+
+        return ResultGenerator.ok();
 
     }
 
@@ -129,8 +188,21 @@ public class ImageController {
 
     }
 
-    @GetMapping("/view/{urn}")
-    public void view() {
+    @GetMapping(value = "/view/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] view(@PathVariable String urn) throws IOException {
+
+        String path = notFoundImage;
+        String url = imageService.getUrlByUrn(urn);
+        if (url != null) path = url;
+
+        String filepath = FileUtils.getAbsolutePath(path);
+
+        FileInputStream fis = new FileInputStream(new File(filepath));
+        byte[] bytes = new byte[fis.available()];
+        fis.read(bytes, 0, fis.available());
+        return bytes;
+
 
     }
 

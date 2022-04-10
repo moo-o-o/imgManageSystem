@@ -18,4 +18,14 @@ public class ImageTagsServiceImpl extends ServiceImpl<ImageTagsMapper, ImageTags
     public List<Integer> getTagIdByImgId(Integer imgId) {
         return imageTagsMapper.selectTagIdByImgId(imgId);
     }
+
+    @Override
+    public Integer getByTagIdAndImgId(Integer tagId, Integer imgId) {
+        return imageTagsMapper.selectByTagIdAndImgId(tagId, imgId);
+    }
+
+    @Override
+    public Boolean removeAllTagsByImgId(Integer imgId) {
+        return imageTagsMapper.deleteAllTagsByImgId(imgId) > 0;
+    }
 }

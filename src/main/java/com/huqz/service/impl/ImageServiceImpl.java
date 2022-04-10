@@ -51,5 +51,23 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         return page;
     }
 
+    @Override
+    public Image getByImgIdAndUserId(Integer imgId, Integer userId) {
+        return imageMapper.selectByImgIdAndUserId(imgId, userId);
+    }
 
+    @Override
+    public boolean updateCategoryByImgIdAndUserId(Integer imgId, Integer userId, Integer categoryId) {
+        return imageMapper.updateCategoryByImgIdAndUserId(imgId, userId, categoryId) > 0;
+    }
+
+    @Override
+    public Integer getCategoryIdByImgIdAndUserId(Integer imgId, Integer userId) {
+        return imageMapper.selectCategoryIdByImgIdAndUserId(imgId, userId);
+    }
+
+    @Override
+    public String getUrlByUrn(String urn) {
+        return imageMapper.selectUrlByUrn(urn);
+    }
 }

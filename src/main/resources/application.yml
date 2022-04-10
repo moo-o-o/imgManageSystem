@@ -53,3 +53,5 @@ imgs:
   upload:
     tags:
       maxNum: 3
+  view:
+    notFound: not_found.jpg   # 找不到图片时显示 在static目录下

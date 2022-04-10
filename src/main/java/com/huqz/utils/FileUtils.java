@@ -59,6 +59,7 @@ public class FileUtils {
     }
 
     public static String getAbsolutePath(String filepath) {
+        createDirIfNotExists();
         return Paths.get(absolutePath, STATIC_FOLDER, filepath).toString();
     }
 
