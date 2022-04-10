@@ -1,5 +1,6 @@
 package com.huqz.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ public class User implements UserDetails{
     private String headImg;
 //    private Boolean enabled;
     private Boolean locked;
+    @TableField(exist = false)
     private List<Role> roles;
 
     @Override

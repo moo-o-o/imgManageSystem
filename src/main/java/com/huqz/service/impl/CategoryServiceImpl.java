@@ -33,6 +33,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    public Boolean cancelShareByCategoryId(Integer categoryId) {
+        return categoryMapper.updateShareByCategoryId(categoryId) > 0;
+    }
+
+    @Override
     public Category getByCategoryIdAndUserId(Integer categoryId, Integer userId) {
         if (userId == 0) return null;
         return categoryMapper.selectByCategoryIdAndUserId(categoryId, userId);

@@ -14,4 +14,6 @@ public interface CategoryService extends IService<Category> {
     Category getByCategoryIdAndUserId(Integer categoryId, Integer userId);
 
     List<Category> getByUserId(Integer userId);
+
+    Boolean cancelShareByCategoryId(Integer categoryId);
 }

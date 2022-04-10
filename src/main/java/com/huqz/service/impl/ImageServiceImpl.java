@@ -9,6 +9,7 @@ import com.huqz.model.Image;
 import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.service.ImageService;
 import com.huqz.service.TagService;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +70,15 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     @Override
     public String getUrlByUrn(String urn) {
         return imageMapper.selectUrlByUrn(urn);
+    }
+
+    @Override
+    public List<Image> getImageByUserIdAndCategoryId(Integer userId, Integer categoryId) {
+        return imageMapper.selectByUserIdAnCategoryId(userId, categoryId);
+    }
+
+    @Override
+    public String getUrlByImgId(Integer imgId) {
+        return imageMapper.selectUrlByImgId(imgId);
     }
 }

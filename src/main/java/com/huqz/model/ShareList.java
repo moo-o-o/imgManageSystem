@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 public class ShareList {
     private Integer id;
     private Integer userId;
-    private Boolean type;
-    private String status;
     private Integer categoryId;
+    private String type;
+    private Boolean status;
     private Timestamp createTime;
 }

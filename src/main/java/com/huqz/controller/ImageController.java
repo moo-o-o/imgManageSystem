@@ -10,10 +10,7 @@ import com.huqz.pojo.imgDTO.FileDTO;
 import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.pojo.imgDTO.UpdateDTO;
 import com.huqz.pojo.imgDTO.UploadDTO;
-import com.huqz.service.CategoryService;
-import com.huqz.service.ImageService;
-import com.huqz.service.ImageTagsService;
-import com.huqz.service.TagService;
+import com.huqz.service.*;
 import com.huqz.utils.FileUtils;
 import com.huqz.utils.ImageUtils;
 import com.huqz.utils.UrnUtils;
@@ -50,6 +47,9 @@ public class ImageController {
 
     @Autowired
     private ImageTagsService imageTagsService;
+
+    @Autowired
+    private ShareImageService shareImageService;
 
     @Value("${imgs.upload.tags.maxNum}")
     private Integer tagMaxNum;
@@ -202,8 +202,26 @@ public class ImageController {
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes, 0, fis.available());
         return bytes;
+    }
 
+    @GetMapping(value = "/view/share/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] viewShare(@PathVariable String urn) throws IOException {
 
+        String path = notFoundImage;
+        if (urn.length() == 32) {
+            ShareImage shareImage = shareImageService.getImageByUrn(urn);
+            if (shareImage != null && shareImage.getStatus()) {
+                path = imageService.getUrlByImgId(shareImage.getImgId());
+            }
+        }
+
+        String filepath = FileUtils.getAbsolutePath(path);
+
+        FileInputStream fis = new FileInputStream(new File(filepath));
+        byte[] bytes = new byte[fis.available()];
+        fis.read(bytes, 0, fis.available());
+        return bytes;
     }
 
     @PostMapping("/confirm_to_visit")

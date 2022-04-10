@@ -41,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/send_reg_mail");
         web.ignoring().antMatchers("/static/**");
         web.ignoring().antMatchers("/imgs/view/**");
+        web.ignoring().antMatchers("/share/query/**");
     }
 
     @Override

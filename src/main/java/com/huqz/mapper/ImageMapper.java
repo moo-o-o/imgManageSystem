@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface ImageMapper extends BaseMapper<Image> {
@@ -23,5 +25,12 @@ public interface ImageMapper extends BaseMapper<Image> {
 
     @Select("select url from image where urn = #{urn}")
     String selectUrlByUrn(String urn);
+
+    @Select("select * from image where user_id = #{userId} and category_id = #{categoryId}")
+    List<Image> selectByUserIdAnCategoryId(Integer userId, Integer categoryId);
+
+    @Select("Select url from image where id = #{imgId}")
+    String selectUrlByImgId(Integer imgId);
+
 
 }

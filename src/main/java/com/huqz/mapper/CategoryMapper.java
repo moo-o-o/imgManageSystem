@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.huqz.model.Category;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +24,7 @@ public interface CategoryMapper extends BaseMapper<Category> {
 
     @Select("select * from category where user_id = #{userId}")
     List<Category> selectByUserId(Integer userId);
+
+    @Update("update category set share_id = null, shared = 0 where id = #{categoryId}")
+    Integer updateShareByCategoryId(Integer categoryId);
 }

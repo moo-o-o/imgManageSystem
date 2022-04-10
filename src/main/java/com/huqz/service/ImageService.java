@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.huqz.model.Image;
 import com.huqz.pojo.imgDTO.PageDTO;
 
+import java.util.List;
+
 public interface ImageService extends IService<Image> {
 
     IPage<Image> getPageByAnyCondition(PageDTO pageDTO, Integer userId);
@@ -16,5 +18,9 @@ public interface ImageService extends IService<Image> {
     Integer getCategoryIdByImgIdAndUserId(Integer imgId, Integer userId);
 
     String getUrlByUrn(String urn);
+
+    List<Image> getImageByUserIdAndCategoryId(Integer userId, Integer categoryId);
+
+    String getUrlByImgId(Integer imgId);
 
 }
