@@ -1,6 +1,7 @@
 package com.huqz.model;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import java.util.List;
 public class User implements UserDetails{
     private Integer id;
     private String username;
+    @JsonIgnore
     private String password;
     private String mail;
     private String nickname;

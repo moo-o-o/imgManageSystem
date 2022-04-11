@@ -23,39 +23,14 @@ public class FileUtils {
 
     private static String UPLOAD_FOLDER = Paths.get("upload", "images").toString();
 
+    private static String AVATAR_FOLDER = Paths.get("upload", "avatar").toString();
+
     public static FileDTO upload(MultipartFile file) throws FileTypeException, IOException {
-        createDirIfNotExists();
+        return save(file, "image");
+    }
 
-        if (file.isEmpty()) throw new FileNotFoundException("文件不存在");
-
-        String filename = file.getOriginalFilename();
-        String suffix = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
-
-        if (!usableSuffix.contains(suffix)) {
-            throw new FileTypeException("文件格式错误");
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-
-        String rename = sdf.format(new Date()) + "/"
-                + UUID.randomUUID().toString().replace("-", "")
-                + "." + suffix;
-
-        Path path = Paths.get(absolutePath, STATIC_FOLDER, UPLOAD_FOLDER, rename);
-        File upload = new File(String.valueOf(path));
-        if (!upload.exists()) {
-            upload.mkdirs();
-        }
-        file.transferTo(upload);
-
-        FileDTO fileDTO = new FileDTO();
-        fileDTO.setFilename(filename);
-        fileDTO.setUploadTime(String.valueOf(System.currentTimeMillis()));
-        fileDTO.setPath(Paths.get(UPLOAD_FOLDER, rename).toString());
-        fileDTO.setFlag(true);
-        fileDTO.setAbsPath(path.toString());
-
-        return fileDTO;
+    public static FileDTO uploadHead(MultipartFile file) throws IOException, FileTypeException {
+        return save(file, "head");
     }
 
     public static String getAbsolutePath(String filepath) {
@@ -85,6 +60,47 @@ public class FileUtils {
             upload.mkdirs();
         }
 
+    }
+
+    public static FileDTO save(MultipartFile file, String type) throws IOException, FileTypeException {
+        createDirIfNotExists();
+
+        if (file.isEmpty()) throw new FileNotFoundException("文件不存在");
+
+        String filename = file.getOriginalFilename();
+        String suffix = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+
+        if (!usableSuffix.contains(suffix)) {
+            throw new FileTypeException("文件格式错误");
+        }
+        String targetFolder;
+        String rename;
+
+        if ("head".equals(type)) {
+            targetFolder = AVATAR_FOLDER;
+            rename = UUID.randomUUID().toString().replace("-", "") + "." + suffix;
+        }else {
+            targetFolder = UPLOAD_FOLDER;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            rename = sdf.format(new Date()) + "/"
+                    + UUID.randomUUID().toString().replace("-", "")
+                    + "." + suffix;
+        }
+        Path path = Paths.get(absolutePath, STATIC_FOLDER, targetFolder, rename);
+        File upload = new File(String.valueOf(path));
+        if (!upload.exists()) {
+            upload.mkdirs();
+        }
+        file.transferTo(upload);
+
+        FileDTO fileDTO = new FileDTO();
+        fileDTO.setFilename(filename);
+        fileDTO.setUploadTime(String.valueOf(System.currentTimeMillis()));
+        fileDTO.setPath(Paths.get(targetFolder, rename).toString());
+        fileDTO.setFlag(true);
+        fileDTO.setAbsPath(path.toString());
+
+        return fileDTO;
     }
 
 }

@@ -178,16 +178,6 @@ public class ImageController {
 
     }
 
-    @GetMapping("/refresh_uri")
-    public void refreshUrl() {
-
-    }
-
-    @GetMapping("/download/{urn}")
-    public void download() {
-
-    }
-
     @GetMapping(value = "/view/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public byte[] view(@PathVariable String urn) throws IOException {
@@ -226,6 +216,16 @@ public class ImageController {
 
     @PostMapping("/confirm_to_visit")
     public void recover() {
+
+    }
+
+    @GetMapping("/refresh_uri")
+    public void refreshUrl() {
+
+    }
+
+    @GetMapping("/download/{urn}")
+    public void download() {
 
     }
 

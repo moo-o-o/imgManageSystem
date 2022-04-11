@@ -112,6 +112,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     response.getWriter().write(JSON.toJSONString(ok));
                 }))
                 .and()
+                .exceptionHandling()
+                .accessDeniedHandler(((request, response, accessDeniedException) -> {
+                    Result result = ResultGenerator.fail(ResultCode.FORBIDDEN, "权限不足");
+                    response.setContentType("application/json;charset=utf-8");
+                    response.getWriter().write(JSON.toJSONString(result));
+                }))
+                .and()
                 .csrf().disable();
     }
 

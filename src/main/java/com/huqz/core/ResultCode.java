@@ -5,6 +5,7 @@ public enum ResultCode {
     FAIL(400),
     INVALID_ARGS(401),
     UNAUTHORIZED(402),
+    FORBIDDEN(403),
     NOT_FOUNT(404),
     INTERNAL_SERVER_ERROR(500),
 
@@ -17,7 +18,7 @@ public enum ResultCode {
     SEND_MAIL_FAILED(1006),           // 邮件发送失败
     EXPIRED_MAIL_CODE(1007),          // 验证码过期
     INVALID_MAIL_CODE(1008),          // 验证码错误
-    ERROR_REGISTE_DATA(1009),         // 邮箱验证数据异常
+    ERROR_REGISTER_DATA(1009),         // 邮箱验证数据异常
     ERROR_ACCOUNT_OR_EMAIL(1010),     // 无效的邮箱或者帐号
     UNKNOWN_SORT_ID(1011),            // 不存在的分类ID
     BAD_OBJECT_ID(1012),              // 无效的object_id

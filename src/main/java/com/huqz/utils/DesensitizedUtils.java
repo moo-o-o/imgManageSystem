@@ -3,42 +3,30 @@ package com.huqz.utils;
 
 public class DesensitizedUtils {
 
+    private final static String USERNAME_REGEX = "^(\\w{2})\\w*(\\w{1})$";
+
+    private final static String EMAIL_REGEX = "(.{2}).+(.{2}@.+)";
+
+
     /**
      * 对字符串进行脱敏操作
      *
-     * @param origin          原始字符串
-     * @param prefixNoMaskLen 左侧需要保留几位明文字段
-     * @param suffixNoMaskLen 右侧需要保留几位明文字段
-     * @param maskStr         用于遮罩的字符串, 如'*'
-     * @return 脱敏后结果
      */
-    public static String desValue(String origin, int prefixNoMaskLen, int suffixNoMaskLen, String maskStr) {
-        if (origin == null) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0, n = origin.length(); i < n; i++) {
-            if (i < prefixNoMaskLen) {
-                sb.append(origin.charAt(i));
-                continue;
-            }
-            if (i > (n - suffixNoMaskLen - 1)) {
-                sb.append(origin.charAt(i));
-                continue;
-            }
-            sb.append(maskStr);
-        }
-        return sb.toString();
+    public static String desValue(String origin, String template) {
+        if (origin == null) return null;
+        return origin.replaceAll(template, "$1****$2");
     }
 
-    /**
-     * 【用户名】 显示前两位，后一位，其他隐蔽
-     * @param username 用户名
-     * @return 结果
-     */
     public static String deUsername(String username) {
+        return desValue(username, USERNAME_REGEX);
+    }
 
-        return desValue(username, 2, 1, "*");
+    public static String deEmail(String mail) {
+        return desValue(mail, EMAIL_REGEX);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(deUsername("20220411"));
+        System.out.println(deEmail("1720868421@qq.com"));
     }
 }
