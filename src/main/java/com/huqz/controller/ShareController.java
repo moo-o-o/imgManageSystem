@@ -123,12 +123,11 @@ public class ShareController {
     }
 
     @DeleteMapping
-    public Result delete(@RequestBody Map<String, Integer> map) {
+    public Result delete(@RequestParam("shareId")Integer shareId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
         Integer userId = principal.getId();
-        Integer shareId = map.get("shareId");
 
         if (shareId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
 

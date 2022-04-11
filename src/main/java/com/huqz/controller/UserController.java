@@ -128,7 +128,7 @@ public class UserController {
         principal.setHeadImg(upload.getPath());
 
         userService.updateById(principal);
-        return ResultGenerator.ok();
+        return ResultGenerator.ok(upload);
     }
 
     @PostMapping("/nickname")

@@ -21,7 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -105,7 +107,7 @@ public class ImageController {
             );
         }
 
-        return ResultGenerator.ok();
+        return ResultGenerator.ok(fileDTO);
     }
 
     @GetMapping
@@ -128,12 +130,11 @@ public class ImageController {
     }
 
     @DeleteMapping
-    public Result del(@RequestBody Map<String, Integer> map) {
+    public Result del(@RequestParam("id")Integer imgId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
         Integer userId = principal.getId();
-        Integer imgId = map.get("id");
         if (imgId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
 
         Image image = imageService.getByImgIdAndUserId(imgId, userId);

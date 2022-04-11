@@ -20,7 +20,7 @@ public class ImageUtils {
         String fileName = getFileName(filepath);
         String fileSuffix = fileName.split("\\.")[1];
 
-        String thumbName = "thumb-" + DigestUtils.md5DigestAsHex(fileName.getBytes()) + fileSuffix;
+        String thumbName = "thumb-" + DigestUtils.md5DigestAsHex(fileName.getBytes()) + '.' + fileSuffix;
         String thumbAbsolutePath = absolutePath.replace(fileName, thumbName);
         String thumbPath = filepath.replace(fileName, thumbName);
 

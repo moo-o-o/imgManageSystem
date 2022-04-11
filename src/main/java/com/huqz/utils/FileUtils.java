@@ -4,14 +4,16 @@ import com.huqz.exception.FileTypeException;
 import com.huqz.pojo.imgDTO.FileDTO;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class FileUtils {
@@ -65,7 +67,7 @@ public class FileUtils {
     public static FileDTO save(MultipartFile file, String type) throws IOException, FileTypeException {
         createDirIfNotExists();
 
-        if (file.isEmpty()) throw new FileNotFoundException("文件不存在");
+        if (file == null || file.isEmpty() ) throw new FileNotFoundException("文件不存在");
 
         String filename = file.getOriginalFilename();
         String suffix = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
@@ -73,24 +75,13 @@ public class FileUtils {
         if (!usableSuffix.contains(suffix)) {
             throw new FileTypeException("文件格式错误");
         }
-        String targetFolder;
-        String rename;
 
-        if ("head".equals(type)) {
-            targetFolder = AVATAR_FOLDER;
-            rename = UUID.randomUUID().toString().replace("-", "") + "." + suffix;
-        }else {
-            targetFolder = UPLOAD_FOLDER;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-            rename = sdf.format(new Date()) + "/"
-                    + UUID.randomUUID().toString().replace("-", "")
-                    + "." + suffix;
-        }
+        String rename = genFilename(type, suffix);
+        String targetFolder = getUploadFolder(type);
+
         Path path = Paths.get(absolutePath, STATIC_FOLDER, targetFolder, rename);
         File upload = new File(String.valueOf(path));
-        if (!upload.exists()) {
-            upload.mkdirs();
-        }
+        Boolean aBoolean = upload.exists() || upload.mkdirs();
         file.transferTo(upload);
 
         FileDTO fileDTO = new FileDTO();
@@ -102,5 +93,42 @@ public class FileUtils {
 
         return fileDTO;
     }
+
+    public static boolean saveBin(HttpServletRequest request) throws IOException {
+        String dest = "D:/imgs/hello.jpg";
+        BufferedInputStream bis = new BufferedInputStream(request.getInputStream());
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
+        int len = 0;
+        byte[] bytes = new byte[8*1024];
+        while ((len = bis.read(bytes)) != -1) {
+            bos.write(bytes, 0, len);
+        }
+        bis.close();
+        bos.close();
+        return true;
+
+    }
+
+    private static String genFilename(String type, String suffix) {
+        String rename;
+        if ("head".equals(type)) {
+            rename = UUID.randomUUID().toString().replace("-", "") + "." + suffix;
+        }else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            rename = sdf.format(new Date()) + "/"
+                    + UUID.randomUUID().toString().replace("-", "")
+                    + "." + suffix;
+        }
+        return rename;
+    }
+
+    private static String getUploadFolder(String type) {
+        return "head".equals(type) ? AVATAR_FOLDER : UPLOAD_FOLDER;
+    }
+
+    private static void touch(String absolutePath) {
+        File file = new File(absolutePath);
+    }
+
 
 }

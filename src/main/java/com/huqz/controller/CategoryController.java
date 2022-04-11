@@ -90,11 +90,10 @@ public class CategoryController {
     }
 
     @DeleteMapping
-    public Result delete(@RequestBody Map<String, Integer> map) {
+    public Result delete(@RequestParam("categoryId")Integer categoryId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
-        Integer categoryId = map.get("categoryId");
         if (categoryId == null)
             return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数不合法");
 
