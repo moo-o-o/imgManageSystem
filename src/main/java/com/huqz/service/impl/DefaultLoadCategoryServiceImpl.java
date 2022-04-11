@@ -18,4 +18,9 @@ public class DefaultLoadCategoryServiceImpl extends ServiceImpl<DefaultLoadCateg
         return defaultLoadCategoryMapper.deleteByUserId(userId) > 0;
     }
 
+    @Override
+    public DefaultLoadCategory getByUserId(Integer userId) {
+        return defaultLoadCategoryMapper.selectByUserId(userId);
+    }
+
 }

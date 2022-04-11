@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,15 @@ public class CategoryController {
         List<Category> list = categoryService.getByUserId(userId);
         list.add(0, categoryService.getDefault());
 
-        return ResultGenerator.ok(list);
+        Integer defaultId = 1;
+        DefaultLoadCategory defaultLoadCategory = defaultLoadCategoryService.getByUserId(userId);
+        if (defaultLoadCategory != null) defaultId = defaultLoadCategory.getId();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("records", list);
+        map.put("defaultLoadCategoryId", defaultId);
+
+        return ResultGenerator.ok(map);
     }
 
     @PostMapping

@@ -5,6 +5,7 @@ import com.huqz.model.DefaultLoadCategory;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 @Mapper
@@ -14,4 +15,6 @@ public interface DefaultLoadCategoryMapper extends BaseMapper<DefaultLoadCategor
     @Delete("delete from default_load_category where user_id = #{userId}")
     int deleteByUserId(Integer userId);
 
+    @Select("select * from default_load_category where user_id = #{userId}")
+    DefaultLoadCategory selectByUserId(Integer userId);
 }

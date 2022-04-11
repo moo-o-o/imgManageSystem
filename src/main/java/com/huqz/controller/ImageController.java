@@ -109,11 +109,19 @@ public class ImageController {
     }
 
     @GetMapping
-    public Result list(@RequestBody PageDTO pageDTO) {
+    public Result list(@RequestParam(value = "pageSize", defaultValue = "5")Integer pageSize,
+                       @RequestParam(value = "pageNumber", defaultValue = "1")Integer pageNumber,
+                       @RequestParam(value = "categoryId", required = false)Integer categoryId,
+                       @RequestParam(value = "tag", required = false)String tag) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
         Integer userId = principal.getId();
+        PageDTO pageDTO = new PageDTO();
+        pageDTO.setPageSize(pageSize);
+        pageDTO.setPageNumber(pageNumber);
+        pageDTO.setCategoryId(categoryId);
+        pageDTO.setTag(tag);
 
         IPage<Image> page = imageService.getPageByAnyCondition(pageDTO, userId);
         return ResultGenerator.ok(page);

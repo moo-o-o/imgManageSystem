@@ -6,4 +6,6 @@ import com.huqz.model.DefaultLoadCategory;
 public interface DefaultLoadCategoryService extends IService<DefaultLoadCategory> {
 
     boolean removeByUserId(Integer userId);
+
+    DefaultLoadCategory getByUserId(Integer userId);
 }
