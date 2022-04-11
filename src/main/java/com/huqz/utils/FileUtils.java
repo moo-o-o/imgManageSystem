@@ -2,9 +2,11 @@ package com.huqz.utils;
 
 import com.huqz.exception.FileTypeException;
 import com.huqz.pojo.imgDTO.FileDTO;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.UUID;
@@ -80,9 +83,15 @@ public class FileUtils {
         String targetFolder = getUploadFolder(type);
 
         Path path = Paths.get(absolutePath, STATIC_FOLDER, targetFolder, rename);
-        File upload = new File(String.valueOf(path));
-        Boolean aBoolean = upload.exists() || upload.mkdirs();
-        file.transferTo(upload);
+
+        // 保存图片
+        byte[] bytes = file.getBytes();
+        String s = new String(bytes);
+        byte[] bytes1 = Base64.decodeBase64(s);
+        FileOutputStream fos = new FileOutputStream(path.toString());
+        fos.write(bytes1);
+        fos.flush();
+        fos.close();
 
         FileDTO fileDTO = new FileDTO();
         fileDTO.setFilename(filename);
@@ -94,18 +103,45 @@ public class FileUtils {
         return fileDTO;
     }
 
-    public static boolean saveBin(HttpServletRequest request) throws IOException {
-        String dest = "D:/imgs/hello.jpg";
-        BufferedInputStream bis = new BufferedInputStream(request.getInputStream());
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
-        int len = 0;
-        byte[] bytes = new byte[8*1024];
-        while ((len = bis.read(bytes)) != -1) {
-            bos.write(bytes, 0, len);
-        }
-        bis.close();
-        bos.close();
-        return true;
+    public static void saveBin(MultipartFile file) throws IOException {
+//        String s = Arrays.toString(Base64.encodeBase64(file.getBytes()));
+//        System.out.println(s);
+        String filename = file.getOriginalFilename();
+        String suffix = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        String dest = "D:/imgs/hello." + suffix;
+        // 直接存bytes
+//        byte[] bytes = file.getBytes();
+//        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
+//        bos.write(bytes);
+//        bos.flush();
+//        bos.close();
+        // 存字节流
+//        InputStream is = file.getInputStream();
+//        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
+//        int len = 0;
+//        byte[] bys = new byte[8*1024];
+//        while ((len = is.read(bys)) != -1) {
+//            bos.write(bys, 0, len);
+//        }
+//        bos.flush();
+//        bos.close();
+//        is.close();
+        // buff
+//        InputStream is = file.getInputStream();
+//        BufferedInputStream bis = new BufferedInputStream(file.getInputStream());
+//        bis.
+//        BufferedOutputStream bos = new BufferedOutputStream()
+
+        // bytes
+        byte[] bytes = file.getBytes();
+        String s = new String(bytes);
+        byte[] bytes1 = Base64.decodeBase64(s);
+        FileOutputStream fos = new FileOutputStream(dest);
+        fos.write(bytes1);
+        fos.flush();
+        fos.close();
+
+
 
     }
 
@@ -125,10 +161,4 @@ public class FileUtils {
     private static String getUploadFolder(String type) {
         return "head".equals(type) ? AVATAR_FOLDER : UPLOAD_FOLDER;
     }
-
-    private static void touch(String absolutePath) {
-        File file = new File(absolutePath);
-    }
-
-
 }

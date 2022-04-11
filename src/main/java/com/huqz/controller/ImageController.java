@@ -22,15 +22,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -92,29 +91,30 @@ public class ImageController {
 
         // 处理标签 (根据maxNum来限制传递个数)
         List<String> tags = uploadDTO.getTags();
-        for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
-            // 查询是否已经有该标签
-            Tag tag = tagService.getByTagName(tags.get(i));
-            // 没有标签则先存入
-            if (tag == null) {
-                tag = new Tag().setTagName(tags.get(i));
-                tagService.save(tag);// 上传标签
+        if (tags != null)
+            for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
+                // 查询是否已经有该标签
+                Tag tag = tagService.getByTagName(tags.get(i));
+                // 没有标签则先存入
+                if (tag == null) {
+                    tag = new Tag().setTagName(tags.get(i));
+                    tagService.save(tag);// 上传标签
+                }
+                // 关联图片和标签
+                imageTagsService.save(
+                        new ImageTags().setImgId(image.getId())
+                                .setTagId(tag.getId())
+                );
             }
-            // 关联图片和标签
-            imageTagsService.save(
-                    new ImageTags().setImgId(image.getId())
-                            .setTagId(tag.getId())
-            );
-        }
 
         return ResultGenerator.ok(fileDTO);
     }
 
     @GetMapping
-    public Result list(@RequestParam(value = "pageSize", defaultValue = "5")Integer pageSize,
-                       @RequestParam(value = "pageNumber", defaultValue = "1")Integer pageNumber,
-                       @RequestParam(value = "categoryId", required = false)Integer categoryId,
-                       @RequestParam(value = "tag", required = false)String tag) {
+    public Result list(@RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
+                       @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber,
+                       @RequestParam(value = "categoryId", required = false) Integer categoryId,
+                       @RequestParam(value = "tag", required = false) String tag) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -130,7 +130,7 @@ public class ImageController {
     }
 
     @DeleteMapping
-    public Result del(@RequestParam("id")Integer imgId) {
+    public Result del(@RequestParam("id") Integer imgId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -237,7 +237,6 @@ public class ImageController {
     public void download() {
 
     }
-
 
     public Integer min(Integer a, Integer b) {
         if (a > b) return b;

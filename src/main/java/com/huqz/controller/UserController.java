@@ -119,7 +119,7 @@ public class UserController {
     }
 
     @PostMapping("/avatar")
-    public Result updateHead(@RequestParam("headImage")MultipartFile file) throws FileTypeException, IOException {
+    public Result updateHead(@RequestParam("headImage")MultipartFile file) throws FileTypeException, Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
