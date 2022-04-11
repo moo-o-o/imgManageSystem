@@ -29,7 +29,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
 
         LambdaQueryWrapper<Image> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Image::getUserId, userId);
-        lqw.eq(pageDTO.getCategoryId() != null, Image::getCategoryId, pageDTO.getCategoryId());
+        lqw.eq(pageDTO.getCategoryId() != 0, Image::getCategoryId, pageDTO.getCategoryId());
 
         // 根据tagName查询tagId
         Integer tagId = tagService.getIdByTagName(pageDTO.getTag());

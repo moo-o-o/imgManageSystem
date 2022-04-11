@@ -41,7 +41,7 @@ public class CategoryController {
 
         Integer defaultId = 1;
         DefaultLoadCategory defaultLoadCategory = defaultLoadCategoryService.getByUserId(userId);
-        if (defaultLoadCategory != null) defaultId = defaultLoadCategory.getId();
+        if (defaultLoadCategory != null) defaultId = defaultLoadCategory.getCategoryId();
 
         Map<String, Object> map = new HashMap<>();
         map.put("records", list);
@@ -121,14 +121,22 @@ public class CategoryController {
 
         // 查询用户是否有 该分类
         Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
-        if (c == null) return ResultGenerator.ok();
+        // categoryId 保证可以设置默认为0
+        if (c == null && categoryId != 0) return ResultGenerator.ok();
 
-        DefaultLoadCategory defaultLoadCategory = new DefaultLoadCategory();
-        defaultLoadCategory.setUserId(userId);
-        defaultLoadCategory.setCategoryId(categoryId);
+        DefaultLoadCategory defaultLoad = defaultLoadCategoryService.getByUserId(userId);
+        // 第一次创建默认加载
+        if (defaultLoad == null) {
+            defaultLoad = new DefaultLoadCategory();
+            defaultLoad.setUserId(userId);
+            defaultLoad.setCategoryId(categoryId);
+            defaultLoadCategoryService.save(defaultLoad);
+            return ResultGenerator.ok();
+        }
+        defaultLoad.setCategoryId(categoryId);
 
         // 更新默认加载分类
-        defaultLoadCategoryService.saveOrUpdate(defaultLoadCategory);
+        defaultLoadCategoryService.updateById(defaultLoad);
 
         return ResultGenerator.ok();
     }
