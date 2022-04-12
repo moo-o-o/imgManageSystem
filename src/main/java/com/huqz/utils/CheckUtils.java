@@ -19,6 +19,13 @@ public class CheckUtils {
         return matcher.matches();
     }
 
+    public static boolean checkUsername(String username) {
+        String str = "^[a-zA-Z0-9_-]{4,16}$";
+        Pattern p = Pattern.compile(str);
+        Matcher matcher = p.matcher(username);
+        return matcher.matches();
+    }
+
     public static void main(String[] args) {
         System.out.println(checkMail("xx.xx@qq.com"));
         System.out.println(checkPassword("123-44_009ad"));

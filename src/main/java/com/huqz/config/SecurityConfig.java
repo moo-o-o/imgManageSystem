@@ -39,6 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/register");
         web.ignoring().antMatchers("/send_reg_mail");
+        web.ignoring().antMatchers("/reset");
+        web.ignoring().antMatchers("/send_forget_mail");
         web.ignoring().antMatchers("/static/**");
         web.ignoring().antMatchers("/imgs/view/**");
         web.ignoring().antMatchers("/share/query/**");

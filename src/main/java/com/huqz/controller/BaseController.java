@@ -10,6 +10,7 @@ import com.huqz.pojo.userDTO.MailDTO;
 import com.huqz.pojo.userDTO.RegDTO;
 import com.huqz.pojo.userDTO.ResetDTO;
 import com.huqz.service.*;
+import com.huqz.utils.CheckUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
+import java.util.Map;
 
 @RestController
 public class BaseController {
@@ -68,7 +70,7 @@ public class BaseController {
         return ResultGenerator.ok();
     }
 
-    @PostMapping("/forget")
+//    @PostMapping("/forget")
     public Result forget(@Validated @RequestBody CodeDTO codeDTO) throws MessagingException {
         // 忘记密码，发送重置邮件
         String username = codeDTO.getUsername();
@@ -137,6 +139,38 @@ public class BaseController {
         mailDTO.setMailCode(code);
         cacheService.storeMailCode(mailDTO, token);
         mailService.sendRegisterMail(mailDTO);
+        return ResultGenerator.token("发送邮件成功", token);
+    }
+
+    @PostMapping("/send_forget_mail")
+    public Result sendMail(@RequestBody Map<String, String> map) throws MessagingException {
+
+        String mail = map.get("mail");
+        String username = map.get("username");
+
+        User user;
+        if (mail != null && !"".equals(mail) && CheckUtils.checkMail(mail)) {
+            user = userService.getByMail(mail);
+            if (user == null) return ResultGenerator.fail(ResultCode.ERROR_ACCOUNT_OR_EMAIL, "该邮箱不存在");
+        } else if (username != null && !"".equals(username) && CheckUtils.checkUsername(username)) {
+            user = userService.getByUsername(username);
+            if (user == null) return ResultGenerator.fail(ResultCode.ERROR_ACCOUNT_OR_EMAIL, "该用户名不存在");
+        }else {
+            return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
+        }
+
+        String token = authTokenService.genToken();
+        String code = codeService.genCode();
+
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setUsername(user.getUsername());
+        mailDTO.setMail(user.getMail());
+        mailDTO.setNickname(user.getNickname());
+        mailDTO.setMailCode(code);
+
+        cacheService.storeMailCode(mailDTO, token);
+        mailService.sendForgetMail(mailDTO);
+
         return ResultGenerator.token("发送邮件成功", token);
     }
 
