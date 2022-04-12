@@ -113,7 +113,7 @@ public class ImageController {
     @GetMapping
     public Result list(@RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
                        @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber,
-                       @RequestParam(value = "categoryId", defaultValue = "1") Integer categoryId,
+                       @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId,
                        @RequestParam(value = "tag", required = false) String tag) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();

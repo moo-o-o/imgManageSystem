@@ -19,7 +19,7 @@ public class User implements UserDetails{
     private String mail;
     private String nickname;
     private String headImg;
-//    private Boolean enabled;
+    private Boolean enabled;
     private Boolean locked;
     @TableField(exist = false)
     private List<Role> roles;
@@ -101,9 +101,9 @@ public class User implements UserDetails{
     }
 
 
-//    public void setEnabled(Boolean enabled) {
-//        this.enabled = enabled;
-//    }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public void setLocked(Boolean locked) {
         this.locked = locked;

@@ -18,19 +18,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     UserMapper userMapper;
 
     @Override
-    @Cacheable(value = "user", key = "#mail")
+//    @Cacheable(value = "user", key = "#mail")
     public User getByMail(String mail) {
         return userMapper.selectUserByMail(mail);
     }
 
     @Override
-    @Cacheable(value = "user", key = "#username")
+//    @Cacheable(value = "user", key = "#username")
     public User getByUsername(String username) {
         return userMapper.selectUserByUsername(username);
     }
 
     @Override
-    @Cacheable(value = "userDetails", key = "#username")
+//    @Cacheable(value = "userDetails", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("username: " + username);
         User user = userMapper.selectUserByUsername(username);
