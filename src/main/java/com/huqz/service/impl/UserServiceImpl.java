@@ -58,4 +58,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String encodePassword = new BCryptPasswordEncoder(10).encode(password);
         return userMapper.updatePasswordById(encodePassword, id) > 0;
     }
+
+    @Override
+    public User getByHead(String urn) {
+        return userMapper.selectByHead(urn);
+    }
 }

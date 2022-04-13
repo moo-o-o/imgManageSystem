@@ -32,5 +32,8 @@ public interface ImageMapper extends BaseMapper<Image> {
     @Select("Select url from image where id = #{imgId}")
     String selectUrlByImgId(Integer imgId);
 
+    @Select("select url from image where thumb_urn = #{thumbUrn}")
+    String selectUrlByThumbUrn(String thumbUrn);
+
 
 }

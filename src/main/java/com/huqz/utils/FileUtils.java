@@ -3,6 +3,7 @@ package com.huqz.utils;
 import com.huqz.exception.FileTypeException;
 import com.huqz.pojo.imgDTO.FileDTO;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;

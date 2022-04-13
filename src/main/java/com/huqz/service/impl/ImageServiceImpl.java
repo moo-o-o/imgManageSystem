@@ -81,4 +81,9 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     public String getUrlByImgId(Integer imgId) {
         return imageMapper.selectUrlByImgId(imgId);
     }
+
+    @Override
+    public String getUrlByThumbUrn(String thumbUrn) {
+        return imageMapper.selectUrlByThumbUrn(thumbUrn);
+    }
 }

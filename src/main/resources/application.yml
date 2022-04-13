@@ -1,57 +1,55 @@
 server:
   port: 8081
+
 spring:
   datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql:///security?useUnicode=true&characterEncoding=utf8
-      username: root
-      password: root
-
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///security?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
   cache:
     type: redis
     redis:
+      key-prefix: imgs_
       time-to-live: 15m
       use-key-prefix: true
       cache-null-values: true
-      key-prefix: imgs_
   redis:
     port: 6379
-    host: localhost
+    host: localhost  # localhost
+#    password:
   mail:
     host: smtp.qq.com
     username: awsl.simple@qq.com
     password: tciqnmxijcladhea
-    #    port: 465
-
+    port: 587
   thymeleaf:
     mode: HTML
-    cache: false
-    #    prefix: classpath:/templates/mail/
     suffix: .html
-  #    servlet:
-  #      content-type: text/html
-  #    check-template-location: true
-
   jackson:
-    default-property-inclusion: non_null  # 返回前端json时，若参数为null则不显示
+    default-property-inclusion: non_null
   mvc:
-    static-path-pattern: /static/**   # 静态资源请求路径
+    static-path-pattern: /static/**
   servlet:
     multipart:
       enabled: true
-      max-file-size: 20MB    # 设置文件最大体积
+      max-file-size: 20MB
 
 mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
 
 imgs:
   upload:
+    dir: D:/imgs/  # absolute path for saving image
+    suffix: .png.jpg.jpeg.webp.gif  # image format supported upload
     tags:
       maxNum: 3
   view:
-    notFound: not_found.jpg   # 找不到图片时显示 在static目录下
+    notFound: D:/imgs/not_found.jpg  # absolute path
+
+
+
+
+

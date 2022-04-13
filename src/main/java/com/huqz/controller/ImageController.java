@@ -11,8 +11,7 @@ import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.pojo.imgDTO.UpdateDTO;
 import com.huqz.pojo.imgDTO.UploadDTO;
 import com.huqz.service.*;
-import com.huqz.utils.FileUtils;
-import com.huqz.utils.ImageUtils;
+import com.huqz.utils.FilesUtils;
 import com.huqz.utils.UrnUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,21 +20,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/imgs")
 public class ImageController {
+
+    @Autowired
+    private FilesUtils filesUtils;
 
     @Autowired
     private ImageService imageService;
@@ -52,6 +48,9 @@ public class ImageController {
     @Autowired
     private ShareImageService shareImageService;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${imgs.upload.tags.maxNum}")
     private Integer tagMaxNum;
 
@@ -65,7 +64,7 @@ public class ImageController {
             return ResultGenerator.fail(ResultCode.UNAUTHORIZED, "请先登录");
         }
         User principal = (User) authentication.getPrincipal();
-        FileDTO fileDTO = FileUtils.upload(file);
+        FileDTO fileDTO = filesUtils.save(file, "image");
         if (uploadDTO.getCategoryId() == null) {
             uploadDTO.setCategoryId(1);
         } else {
@@ -78,7 +77,7 @@ public class ImageController {
 
 
         // 设置缩略图
-        String thumbUrn = ImageUtils.createThumb(fileDTO.getPath());
+        String thumbUrn = filesUtils.createThumb(fileDTO.getPath());
 
         Image image = new Image();
         image.setUserId(principal.getId());
@@ -195,7 +194,7 @@ public class ImageController {
         String url = imageService.getUrlByUrn(urn);
         if (url != null) path = url;
 
-        String filepath = FileUtils.getAbsolutePath(path);
+        String filepath = filesUtils.getAbsolutePath(path);
 
         FileInputStream fis = new FileInputStream(new File(filepath));
         byte[] bytes = new byte[fis.available()];
@@ -215,9 +214,44 @@ public class ImageController {
             }
         }
 
-        String filepath = FileUtils.getAbsolutePath(path);
+        String filepath = filesUtils.getAbsolutePath(path);
 
         FileInputStream fis = new FileInputStream(new File(filepath));
+        byte[] bytes = new byte[fis.available()];
+        fis.read(bytes, 0, fis.available());
+        return bytes;
+    }
+
+    @GetMapping(value = "/thumb/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] viewThumb(@PathVariable String urn) throws IOException {
+        String path = notFoundImage;
+        if (urn != null) {
+            String url = imageService.getUrlByThumbUrn(urn);
+            if (url != null) {
+                String filename = url.substring(url.lastIndexOf(File.separator) + 1);
+                String filepath = url.replace(filename, "thumb-" + filename);
+                path = filesUtils.getAbsolutePath(filepath);
+            }
+        }
+
+        FileInputStream fis = new FileInputStream(new File(path));
+        byte[] bytes = new byte[fis.available()];
+        fis.read(bytes, 0, fis.available());
+        return bytes;
+    }
+
+    @GetMapping(value = "/avatar/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] viewAvatar(@PathVariable String urn) throws IOException {
+        String path = notFoundImage;
+        if (urn != null) {
+            User user = userService.getByHead(urn);
+            if (user != null) {
+                path = filesUtils.getHeadAbsolutePath(urn);
+            }
+        }
+        FileInputStream fis = new FileInputStream(new File(path));
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes, 0, fis.available());
         return bytes;

@@ -11,7 +11,7 @@ import com.huqz.pojo.userDTO.MailDTO;
 import com.huqz.service.*;
 import com.huqz.utils.CheckUtils;
 import com.huqz.utils.DesensitizedUtils;
-import com.huqz.utils.FileUtils;
+import com.huqz.utils.FilesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/me")
 public class UserController {
+
+    @Autowired
+    private FilesUtils filesUtils;
 
     @Autowired
     private UserService userService;
@@ -124,8 +128,10 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
-        FileDTO upload = FileUtils.uploadHead(file);
-        principal.setHeadImg(upload.getPath());
+        FileDTO upload = filesUtils.save(file, "head");
+        String path = upload.getPath();
+        String filename = path.substring(path.lastIndexOf(File.separator) + 1);
+        principal.setHeadImg(filename);
 
         userService.updateById(principal);
         return ResultGenerator.ok(upload);

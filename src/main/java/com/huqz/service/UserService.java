@@ -11,4 +11,6 @@ public interface UserService extends IService<User>, UserDetailsService {
     User getByMail(String mail);
 
     boolean updatePasswordById(String password, Integer id);
+
+    User getByHead(String urn);
 }

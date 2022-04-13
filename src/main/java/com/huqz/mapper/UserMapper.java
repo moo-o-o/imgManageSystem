@@ -26,5 +26,6 @@ public interface UserMapper extends BaseMapper<User> {
     @Update("update user set password = #{password} where id = ${id}")
     int updatePasswordById(String password, Integer id);
 
-
+    @Select("select * from user where head_img = #{urn}")
+    User selectByHead(String urn);
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.mail.MessagingException;
+import java.io.FileNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,6 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MessagingException.class)
     public Result MessagingException(MessagingException messagingException) {
+        messagingException.printStackTrace();
         return ResultGenerator.fail(ResultCode.SEND_MAIL_FAILED, "发送邮件失败");
     }
 
@@ -57,6 +59,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileTypeException.class)
     public Result FileTypeException(FileTypeException fileTypeException) {
+        fileTypeException.printStackTrace();
         return ResultGenerator.fail(ResultCode.INVALID_FILE_SUFFIX, "无效的文件");
     }
 
@@ -75,5 +78,11 @@ public class GlobalExceptionHandler {
     public Result HttpMessageNotReadableException(HttpMessageNotReadableException httpMessageNotReadableException) {
         httpMessageNotReadableException.printStackTrace();
         return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数不合法");
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public Result fileNotFoundException(FileNotFoundException fileNotFoundException) {
+        fileNotFoundException.printStackTrace();
+        return ResultGenerator.fail(ResultCode.NOT_FOUNT, "文件不存在");
     }
 }

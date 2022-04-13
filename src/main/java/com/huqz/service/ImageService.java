@@ -23,4 +23,6 @@ public interface ImageService extends IService<Image> {
 
     String getUrlByImgId(Integer imgId);
 
+    String getUrlByThumbUrn(String thumbUrn);
+
 }
