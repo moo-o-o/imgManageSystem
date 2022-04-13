@@ -5,10 +5,12 @@ import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
 import com.huqz.model.Category;
 import com.huqz.model.DefaultLoadCategory;
+import com.huqz.model.Image;
 import com.huqz.model.User;
 import com.huqz.pojo.CategoryDTO;
 import com.huqz.service.CategoryService;
 import com.huqz.service.DefaultLoadCategoryService;
+import com.huqz.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private DefaultLoadCategoryService defaultLoadCategoryService;
@@ -85,7 +90,7 @@ public class CategoryController {
         if (c == null) return ResultGenerator.ok();
 
         c.setCategoryName(categoryName);
-        categoryService.saveOrUpdate(c);
+        categoryService.updateById(c);
         return ResultGenerator.ok();
     }
 
@@ -101,6 +106,14 @@ public class CategoryController {
         Integer userId = principal.getId();
         Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
         if (c == null) return ResultGenerator.ok();
+
+        // 处理该分类下的图片 保存到 -617 的分类下
+        List<Image> imageList = imageService.getImageByUserIdAndCategoryId(userId, categoryId);
+        for (Image image : imageList) {
+            image.setCategoryId(-617);
+            imageService.updateById(image);
+        }
+
         categoryService.removeById(categoryId);
         return ResultGenerator.ok();
     }

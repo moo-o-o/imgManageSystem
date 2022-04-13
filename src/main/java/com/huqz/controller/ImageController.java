@@ -156,9 +156,11 @@ public class ImageController {
         Image image = imageService.getByImgIdAndUserId(imgId, userId);
         if (image == null) return ResultGenerator.fail(ResultCode.UNKNOWN_IMG_ID, "无效的图片ID");
 
-        // 该用户是否存在该分类
-        Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
-        if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "不存在的分类");
+        // 该用户是否存在该分类 (排除 默认分类)
+        if (categoryId != 1) {
+            Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
+            if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "不存在的分类");
+        }
         // 不管分类是否发生改变，都执行更新
         imageService.updateCategoryByImgIdAndUserId(imgId, userId, categoryId);
 
@@ -192,11 +194,9 @@ public class ImageController {
 
         String path = notFoundImage;
         String url = imageService.getUrlByUrn(urn);
-        if (url != null) path = url;
+        if (url != null) path = filesUtils.getAbsolutePath(url);
 
-        String filepath = filesUtils.getAbsolutePath(path);
-
-        FileInputStream fis = new FileInputStream(new File(filepath));
+        FileInputStream fis = new FileInputStream(new File(path));
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes, 0, fis.available());
         return bytes;
@@ -210,13 +210,12 @@ public class ImageController {
         if (urn.length() == 32) {
             ShareImage shareImage = shareImageService.getImageByUrn(urn);
             if (shareImage != null && shareImage.getStatus()) {
-                path = imageService.getUrlByImgId(shareImage.getImgId());
+                String url = imageService.getUrlByImgId(shareImage.getImgId());
+                path = filesUtils.getAbsolutePath(url);
             }
         }
 
-        String filepath = filesUtils.getAbsolutePath(path);
-
-        FileInputStream fis = new FileInputStream(new File(filepath));
+        FileInputStream fis = new FileInputStream(new File(path));
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes, 0, fis.available());
         return bytes;
