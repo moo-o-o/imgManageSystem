@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ShareImageService extends IService<ShareImage> {
 
-    List<ShareImage> getImageByShareIdAndStatus(Integer shareId, Boolean status);
+    List<ShareImage> getImageByShareIdAndStatus(String shareId, Boolean status);
 
     Integer getImageIdByUrn(String urn);
 
     ShareImage getImageByUrn(String urn);
 
-    boolean updateStatusManyByShareId(Integer shareId, Boolean status);
+    boolean updateStatusManyByShareId(String shareId, Boolean status);
 }

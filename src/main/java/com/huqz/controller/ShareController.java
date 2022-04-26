@@ -36,10 +36,21 @@ public class ShareController {
     @Autowired
     private TagService tagService;
 
-    private final String SHARE_PREFIX = "?sharedId=";
+    private final String SHARE_PREFIX = "?shareId=";
+
+    @GetMapping
+    public Result getAllShare() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+        List<ShareList> res = shareListService.getByUserId(userId);
+
+        return ResultGenerator.ok(res);
+    }
 
     @PostMapping
-    public Result createSort(@RequestBody Map<String, Integer> map) {
+    public Result createShare(@RequestBody Map<String, Integer> map) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -48,9 +59,9 @@ public class ShareController {
         if (categoryId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
 
         Category category = categoryService.getByCategoryIdAndUserId(categoryId, userId);
-        if (category == null) return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "无效的sortId");
+        if (category == null) return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "无效的categoryId");
 
-        if (category.getShared()) return ResultGenerator.fail(ResultCode.SHARED_SORT_ID, "该分类已经分享");
+        if (category.getShared()) return ResultGenerator.fail(ResultCode.SHARED_CATEGORY_ID, "该分类已经分享");
 
         // 查询在该分类下是否有图片
         List<Image> images = imageService.getImageByUserIdAndCategoryId(userId, categoryId);
@@ -88,8 +99,35 @@ public class ShareController {
 
     }
 
-    @GetMapping("/query")
-    public Result query(@RequestParam("shareId") Integer shareId) {
+    @DeleteMapping("{shareId}")
+    public Result deleteShare(@PathVariable("shareId")String shareId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+
+        if (shareId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
+
+        ShareList shareList = shareListService.getByShareIdAndUserId(shareId, userId);
+        // 该用户不存在该分享ID
+        if (shareList == null) return ResultGenerator.ok();
+
+        if (!shareList.getStatus()) return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
+
+        // 设置已分享的图片 分享状态为 false
+        shareImageService.updateStatusManyByShareId(shareId, false);
+        // 移除 category 库该分类的 shareId
+        if ("category".equals(shareList.getType())) {
+            categoryService.cancelShareByCategoryId(shareList.getCategoryId());
+        }
+        // 设置该shareId的状态为false
+        shareListService.cancelShareById(shareList.getId());
+
+        return ResultGenerator.ok();
+    }
+
+    @GetMapping("/s/{shareId}")
+    public Result query(@PathVariable String shareId) {
 
         ShareList shareList = shareListService.getById(shareId);
         if (shareList == null) return ResultGenerator.fail(ResultCode.INVALID_SHARE_ID, "无效的shareId");
@@ -122,30 +160,4 @@ public class ShareController {
 
     }
 
-    @DeleteMapping
-    public Result delete(@RequestParam("shareId")Integer shareId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User principal = (User) authentication.getPrincipal();
-
-        Integer userId = principal.getId();
-
-        if (shareId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
-
-        ShareList shareList = shareListService.getByShareIdAndUserId(shareId, userId);
-        // 该用户不存在该分享ID
-        if (shareList == null) return ResultGenerator.ok();
-
-        if (!shareList.getStatus()) return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
-
-        // 设置已分享的图片 分享状态为 false
-        shareImageService.updateStatusManyByShareId(shareId, false);
-        // 移除 category 库该分类的 shareId
-        if ("category".equals(shareList.getType())) {
-            categoryService.cancelShareByCategoryId(shareList.getCategoryId());
-        }
-        // 设置该shareId的状态为false
-        shareListService.cancelShareById(shareList.getId());
-
-        return ResultGenerator.ok();
-    }
 }

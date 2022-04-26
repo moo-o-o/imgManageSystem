@@ -1,5 +1,6 @@
 package com.huqz.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +15,7 @@ import java.util.List;
 public class User implements UserDetails{
     private Integer id;
     private String username;
-    @JsonIgnore
+    @JSONField(serialize = false)
     private String password;
     private String mail;
     private String nickname;

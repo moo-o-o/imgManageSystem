@@ -16,8 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +64,7 @@ public class CategoryController {
         Integer userId = principal.getId();
 
         Category c = categoryService.getByCategoryNameAndUserId(categoryName, userId);
-        if (c != null) return ResultGenerator.fail(ResultCode.EXISTING_SORT_NAME, "此分类已存在");
+        if (c != null) return ResultGenerator.fail(ResultCode.EXISTING_CATEGORY_NAME, "此分类已存在");
 
         Category category = new Category();
         category.setCategoryName(categoryName);

@@ -24,7 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/imgs")
@@ -71,7 +73,7 @@ public class ImageController {
             // 查询是否有此分类
             Category c = categoryService.getById(uploadDTO.getCategoryId());
             if (c == null) {
-                return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "不存在的分类");
+                return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "不存在的分类");
             }
         }
 
@@ -106,7 +108,13 @@ public class ImageController {
                 );
             }
 
-        return ResultGenerator.ok(fileDTO);
+        Map<String, Object> res = new HashMap<>();
+            res.put("filename", fileDTO.getFilename());
+            res.put("flag", true);
+            res.put("urn", image.getUrn());
+            res.put("uploadTime", fileDTO.getUploadTime());
+
+        return ResultGenerator.ok(res);
     }
 
     @GetMapping
@@ -159,7 +167,7 @@ public class ImageController {
         // 该用户是否存在该分类 (排除 默认分类)
         if (categoryId != 1) {
             Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
-            if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_SORT_ID, "不存在的分类");
+            if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "不存在的分类");
         }
         // 不管分类是否发生改变，都执行更新
         imageService.updateCategoryByImgIdAndUserId(imgId, userId, categoryId);

@@ -17,7 +17,7 @@ public class ShareImageServiceImpl extends ServiceImpl<ShareImageMapper, ShareIm
     private ShareImageMapper shareImageMapper;
 
     @Override
-    public List<ShareImage> getImageByShareIdAndStatus(Integer shareId, Boolean status) {
+    public List<ShareImage> getImageByShareIdAndStatus(String shareId, Boolean status) {
         return shareImageMapper.selectImageByShareIdAndStatus(shareId, status);
     }
 
@@ -32,7 +32,7 @@ public class ShareImageServiceImpl extends ServiceImpl<ShareImageMapper, ShareIm
     }
 
     @Override
-    public boolean updateStatusManyByShareId(Integer shareId, Boolean status) {
+    public boolean updateStatusManyByShareId(String shareId, Boolean status) {
         return shareImageMapper.updateStatusManyByShareId(shareId, status) > 0;
     }
 }

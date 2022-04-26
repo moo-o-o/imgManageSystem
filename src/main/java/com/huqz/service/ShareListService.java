@@ -4,9 +4,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.huqz.model.ShareImage;
 import com.huqz.model.ShareList;
 
+import java.util.List;
+
 public interface ShareListService extends IService<ShareList> {
 
-    ShareList getByShareIdAndUserId(Integer shareId, Integer userId);
+    ShareList getByShareIdAndUserId(String shareId, Integer userId);
 
-    Boolean cancelShareById(Integer shareId);
+    Boolean cancelShareById(String shareId);
+
+    List<ShareList> getByUserId(Integer userId);
 }

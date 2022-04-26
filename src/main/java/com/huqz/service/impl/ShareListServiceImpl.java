@@ -9,6 +9,8 @@ import com.huqz.service.ShareListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShareListServiceImpl extends ServiceImpl<ShareListMapper, ShareList> implements ShareListService {
 
@@ -16,12 +18,17 @@ public class ShareListServiceImpl extends ServiceImpl<ShareListMapper, ShareList
     private ShareListMapper shareListMapper;
 
     @Override
-    public ShareList getByShareIdAndUserId(Integer shareId, Integer userId) {
+    public ShareList getByShareIdAndUserId(String shareId, Integer userId) {
         return shareListMapper.selectByShareIdAndUserId(shareId, userId);
     }
 
     @Override
-    public Boolean cancelShareById(Integer shareId) {
+    public Boolean cancelShareById(String shareId) {
         return shareListMapper.updateShareById(shareId) > 0;
+    }
+
+    @Override
+    public List<ShareList> getByUserId(Integer userId) {
+        return shareListMapper.selectByUserId(userId);
     }
 }

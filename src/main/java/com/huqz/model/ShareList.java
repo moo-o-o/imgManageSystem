@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @Data
 public class ShareList {
-    private Integer id;
+    private String id;
     private Integer userId;
     private Integer categoryId;
     private String type;

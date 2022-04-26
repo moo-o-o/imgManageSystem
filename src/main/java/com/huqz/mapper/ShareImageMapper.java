@@ -15,7 +15,7 @@ import java.util.List;
 public interface ShareImageMapper extends BaseMapper<ShareImage> {
 
     @Select("select * from share_image where share_id = #{shareId} and status = #{status}")
-    List<ShareImage> selectImageByShareIdAndStatus(Integer shareId, Boolean status);
+    List<ShareImage> selectImageByShareIdAndStatus(String shareId, Boolean status);
 
     @Select("select img_id from share_image where urn = #{urn}")
     Integer selectImageIdByUrn(String urn);
@@ -24,5 +24,5 @@ public interface ShareImageMapper extends BaseMapper<ShareImage> {
     ShareImage selectImageByUrn(String urn);
 
     @Update("update share_image set status = #{status} where share_id = #{shareId}")
-    Integer updateStatusManyByShareId(Integer shareId, Boolean status);
+    Integer updateStatusManyByShareId(String shareId, Boolean status);
 }

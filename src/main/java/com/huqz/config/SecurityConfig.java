@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.huqz.core.Result;
 import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
+import com.huqz.model.User;
 import com.huqz.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +14,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import javax.sql.DataSource;
 
@@ -73,7 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .successHandler(((request, response, authentication) -> {
-                    Object principal = authentication.getPrincipal();
+                    User principal = (User) authentication.getPrincipal();
+                    System.out.println(principal);
                     response.setContentType("application/json;charset=utf-8");
                     Result ok = ResultGenerator.ok(principal);
                     response.getWriter().write(JSON.toJSONString(ok));
@@ -94,15 +98,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     }else {
                         msg = "登陆失败！";
                     }
-                    Result fail = ResultGenerator.fail(ResultCode.UNAUTHORIZED, msg);
+                    Result fail = ResultGenerator.fail(ResultCode.PASSWORD_ERROR, msg);
                     response.getWriter().write(JSON.toJSONString(fail));
                 }))
                 .permitAll()
                 .and()
                 .rememberMe()
-                .rememberMeParameter("remember")
-                .tokenValiditySeconds(3600)
+                .rememberMeParameter("keepLogged")
+                .tokenValiditySeconds(7 * 24 * 60 * 60)
                 .tokenRepository(persistentTokenRepository())
+                .userDetailsService(userService)
                 .and()
                 .logout().logoutUrl("/logout")
                 .clearAuthentication(true)

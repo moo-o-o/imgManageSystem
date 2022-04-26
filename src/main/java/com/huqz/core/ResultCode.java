@@ -20,13 +20,13 @@ public enum ResultCode {
     INVALID_MAIL_CODE(1008),          // 验证码错误
     ERROR_REGISTER_DATA(1009),         // 邮箱验证数据异常
     ERROR_ACCOUNT_OR_EMAIL(1010),     // 无效的邮箱或者帐号
-    UNKNOWN_SORT_ID(1011),            // 不存在的分类ID
+    UNKNOWN_CATEGORY_ID(1011),            // 不存在的分类ID
     BAD_OBJECT_ID(1012),              // 无效的object_id
     UNKNOWN_IMG_ID(1013),             // 无效的图片id
     MAX_IMG_TAG(1014),                // 标签超出上限
     EXISTS_IMG_TAG(1015),             // 已存在的标签
-    EXISTING_SORT_NAME(1016),         // 已存在的分类
-    SHARED_SORT_ID(1017),             // 该分类已经分享
+    EXISTING_CATEGORY_NAME(1016),         // 已存在的分类
+    SHARED_CATEGORY_ID(1017),             // 该分类已经分享
     NOT_EXISTED_ANY_IMG(1018),        // 该分类下无任何图片
     INVALID_SHARE_ID(1019),           // 无效的请求分享ID
     EXPIRED_SHARE(1020),              // 该分享已失效
