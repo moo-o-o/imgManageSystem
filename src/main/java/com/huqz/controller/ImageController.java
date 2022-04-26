@@ -136,8 +136,8 @@ public class ImageController {
         return ResultGenerator.ok(page);
     }
 
-    @DeleteMapping
-    public Result del(@RequestParam("id") Integer imgId) {
+    @DeleteMapping("{imgId}")
+    public Result del(@PathVariable Integer imgId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
