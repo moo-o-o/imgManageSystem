@@ -7,6 +7,7 @@ public enum ResultCode {
     UNAUTHORIZED(402),
     FORBIDDEN(403),
     NOT_FOUNT(404),
+    METHOD_NOT_ALLOWED(405),
     INTERNAL_SERVER_ERROR(500),
 
     INVALID_ACCOUNT(1000),            // 不存在的用户账号

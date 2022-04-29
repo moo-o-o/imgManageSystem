@@ -5,14 +5,14 @@ import com.huqz.pojo.imgDTO.FileDTO;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,6 +54,31 @@ public class FilesUtils {
 
         FileDTO fileDTO = new FileDTO();
         fileDTO.setFilename(filename);
+        fileDTO.setUploadTime(String.valueOf(System.currentTimeMillis()));
+        fileDTO.setPath(Paths.get(uploadFolder, destFolder, rename).toString());
+        fileDTO.setFlag(true);
+        fileDTO.setAbsPath(filepath);
+        return fileDTO;
+
+    }
+
+    public FileDTO saveUrl(String url) throws IOException {
+        String s1 = url.substring(url.indexOf("://") + 3);
+        String domain = s1.substring(0, s1.indexOf("/"));
+        WebClient webClient = WebClient.builder()
+                .exchangeStrategies(builder -> builder.codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(1024*1024*20))).build();
+        Mono<Resource> mono = webClient.get().uri(url).header("referer", domain).retrieve().bodyToMono(Resource.class);
+        Resource res = mono.block();
+
+        String suffix = getTypeByStream(res.getInputStream());
+        String rename = genFilename(suffix);
+        String destFolder = getUploadFolder("formUrl");
+        String filepath = Paths.get(absolutePath, uploadFolder, destFolder, rename).toString();
+
+        Thumbnails.of(res.getInputStream()).scale(1f).toFile(filepath);
+
+        FileDTO fileDTO = new FileDTO();
+        fileDTO.setFilename(url);
         fileDTO.setUploadTime(String.valueOf(System.currentTimeMillis()));
         fileDTO.setPath(Paths.get(uploadFolder, destFolder, rename).toString());
         fileDTO.setFlag(true);
@@ -114,7 +139,60 @@ public class FilesUtils {
 //        String thumbPath = filepath.replace(fileName, thumbName);
         String thumbPath = "thumb-" + DigestUtils.md5DigestAsHex(fileName.getBytes());
 
-        Thumbnails.of(absolutePath).size(160, 160).toFile(thumbAbsolutePath);
+        Thumbnails.of(absolutePath).size(233, 233).toFile(thumbAbsolutePath);
         return thumbPath;
     }
+
+    public String getTypeByStream(InputStream is) throws IOException {
+        if (is == null) {
+            throw new NullPointerException("input stream == null");
+        }
+
+        byte[] bys = new byte[4];
+        is.read(bys, 0, bys.length);
+        String type = byteArrayToHexString(bys).toUpperCase();
+        System.out.println("@@@" + type);
+
+        return getType(type);
+
+    }
+
+    /**
+     * 转换字节数组为十六进制字符串
+     *
+     * @return 十六进制字符串
+     */
+    private String byteArrayToHexString(byte[] b) {
+        StringBuilder resultSb = new StringBuilder();
+        for (byte value : b) {
+            resultSb.append(byteToHexString(value));
+        }
+        return resultSb.toString();
+    }
+
+    // 十六进制下数字到字符的映射数组
+    private final String[] hexDigits = {"0", "1", "2", "3", "4", "5",
+            "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+
+    /**
+     * 将一个字节转化成十六进制形式的字符串
+     */
+    private String byteToHexString(byte b) {
+        int n = b;
+        if (n < 0)
+            n = 256 + n;
+        int d1 = n / 16;
+        int d2 = n % 16;
+        return hexDigits[d1] + hexDigits[d2];
+    }
+
+    private String getType(String s) {
+        if (s.contains("89504E47")) return "png";
+        else if (s.contains("47494638")) return "gif";
+        else if (s.contains("424D")) return "bmp";
+        else if (s.contains("FFD8FF")) return "jpg";
+        else throw new IllegalArgumentException("图片格式错误");
+
+    }
+
 }

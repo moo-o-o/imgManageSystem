@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +53,6 @@ public class ImageController {
 
     @Autowired
     private UserService userService;
-
-    @Value("${imgs.upload.tags.maxNum}")
-    private Integer tagMaxNum;
 
     @Value("${imgs.view.notFound}")
     private String notFoundImage;
@@ -90,23 +88,11 @@ public class ImageController {
 
         imageService.save(image);                    // 上传图片
 
-        // 处理标签 (根据maxNum来限制传递个数)
         List<String> tags = uploadDTO.getTags();
-        if (tags != null)
-            for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
-                // 查询是否已经有该标签
-                Tag tag = tagService.getByTagName(tags.get(i));
-                // 没有标签则先存入
-                if (tag == null) {
-                    tag = new Tag().setTagName(tags.get(i));
-                    tagService.save(tag);// 上传标签
-                }
-                // 关联图片和标签
-                imageTagsService.save(
-                        new ImageTags().setImgId(image.getId())
-                                .setTagId(tag.getId())
-                );
-            }
+        if (tags.size() != 0) {
+            List<Integer> tagIds = tagService.saveMany(tags);
+            imageTagsService.saveManyTags(image.getId(), tagIds);
+        }
 
         Map<String, Object> res = new HashMap<>();
             res.put("filename", fileDTO.getFilename());
@@ -116,6 +102,12 @@ public class ImageController {
 
         return ResultGenerator.ok(res);
     }
+
+
+//    @PostMapping
+//    public Result uploadByApi() {
+//
+//    }
 
     @GetMapping
     public Result list(@RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
@@ -150,14 +142,13 @@ public class ImageController {
         return ResultGenerator.ok();
     }
 
-    @PutMapping
-    public Result update(@RequestBody UpdateDTO updateDTO) {
+    @PutMapping("{imgId}")
+    public Result update(@PathVariable Integer imgId, @RequestBody UpdateDTO updateDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
         Integer userId = principal.getId();
         Integer categoryId = updateDTO.getCategoryId();
-        Integer imgId = updateDTO.getImgId();
         List<String> tags = updateDTO.getTags();
 
         // 该用户是否存在该图片
@@ -178,22 +169,33 @@ public class ImageController {
         imageTagsService.removeAllTagsByImgId(imgId);
 
         // 处理标签
-        for (int i = 0; i < min(tags.size(), tagMaxNum); i++) {
-
-            Tag tag = tagService.getByTagName(tags.get(i));
-            // 新标签则添加
-            if (tag == null) {
-                tag = new Tag().setTagName(tags.get(i));
-                tagService.save(tag);
-            }
-            // 关联图片和标签
-            imageTagsService.save(
-                    new ImageTags().setImgId(imgId).setTagId(tag.getId())
-            );
-        }
+        List<Integer> tagIds = tagService.saveMany(tags);
+        imageTagsService.saveManyTags(imgId, tagIds);
 
         return ResultGenerator.ok();
 
+    }
+
+    @PutMapping
+    public Result moveMany(@RequestBody Map<String, Object> map) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+        List<Integer> imgIds = (List<Integer>) map.get("imgs");
+        Integer categoryId = (Integer) map.get("categoryId");
+
+        Image image = null;
+        Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
+        if (c == null) return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "无该分类");
+
+        for (Integer imgId : imgIds) {
+            image = imageService.getByImgIdAndUserId(imgId, userId);
+            if (image == null) continue;
+            image.setCategoryId(categoryId);
+            imageService.updateById(image);
+        }
+        return ResultGenerator.ok();
     }
 
     @GetMapping(value = "/view/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -264,18 +266,8 @@ public class ImageController {
         return bytes;
     }
 
-    @PostMapping("/confirm_to_visit")
-    public void recover() {
-
-    }
-
     @GetMapping("/refresh_uri")
     public void refreshUrl() {
-
-    }
-
-    @GetMapping("/download/{urn}")
-    public void download() {
 
     }
 

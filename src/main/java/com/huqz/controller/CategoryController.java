@@ -3,17 +3,13 @@ package com.huqz.controller;
 import com.huqz.core.Result;
 import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
-import com.huqz.model.Category;
-import com.huqz.model.DefaultLoadCategory;
-import com.huqz.model.Image;
-import com.huqz.model.User;
+import com.huqz.model.*;
 import com.huqz.pojo.CategoryDTO;
-import com.huqz.service.CategoryService;
-import com.huqz.service.DefaultLoadCategoryService;
-import com.huqz.service.ImageService;
+import com.huqz.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,6 +28,12 @@ public class CategoryController {
 
     @Autowired
     private DefaultLoadCategoryService defaultLoadCategoryService;
+
+    @Autowired
+    private AuthTokenService authTokenService;
+
+    @Autowired
+    private ApiKeyService apiKeyService;
 
     @GetMapping
     public Result list() {
@@ -75,14 +77,15 @@ public class CategoryController {
 
     }
 
-    @PutMapping
-    public Result update(@RequestBody CategoryDTO categoryDTO) {
+    @PutMapping("{categoryId}")
+    public Result update(@RequestBody Map<String, String> map, @PathVariable Integer categoryId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
-        Integer categoryId = categoryDTO.getCategoryId();
-        String categoryName = categoryDTO.getCategoryName();
         Integer userId = principal.getId();
+        String categoryName = map.get("categoryName");
+        if (categoryName == null || "".equals(categoryName.trim()))
+            return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数不合法");
 
         Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
         if (c == null) return ResultGenerator.ok();
@@ -92,8 +95,8 @@ public class CategoryController {
         return ResultGenerator.ok();
     }
 
-    @DeleteMapping
-    public Result delete(@RequestParam("categoryId")Integer categoryId) {
+    @DeleteMapping("{categoryId}")
+    public Result delete(@PathVariable Integer categoryId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -116,12 +119,11 @@ public class CategoryController {
         return ResultGenerator.ok();
     }
 
-    @PostMapping("/set")
-    public Result setDefault(@RequestBody Map<String, Integer> map ) {
+    @PostMapping("/{categoryId}/set")
+    public Result setDefault(@PathVariable Integer categoryId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
-        Integer categoryId = map.get("categoryId");
         Integer userId = principal.getId();
 
         // categoryId 为空 表示不设置默认加载分类
@@ -152,5 +154,26 @@ public class CategoryController {
         return ResultGenerator.ok();
     }
 
+    // 添加用户上传接口
+    @PostMapping("/{categoryId}/key")
+    public Result genAPIKey(@PathVariable Integer categoryId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
 
+        Integer userId = principal.getId();
+        if (categoryId == null || categoryId < 0) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数错误");
+
+        Category c = categoryService.getByCategoryIdAndUserId(categoryId, userId);
+        if (c == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "参数错误");
+
+        String token = authTokenService.genToken();
+
+        ApiKey apiKey = new ApiKey();
+        apiKey.setUserId(userId);
+        apiKey.setCategoryId(categoryId);
+        apiKey.setToken(token);
+
+        apiKeyService.save(apiKey);
+        return ResultGenerator.ok(apiKey);
+    }
 }

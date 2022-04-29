@@ -4,6 +4,7 @@ import com.huqz.core.Result;
 import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
 import com.huqz.exception.MailCodeException;
+import com.huqz.model.Category;
 import com.huqz.model.User;
 import com.huqz.pojo.userDTO.CodeDTO;
 import com.huqz.pojo.userDTO.MailDTO;
@@ -18,25 +19,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 public class BaseController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    CodeService codeService;
+    private CodeService codeService;
 
     @Autowired
-    MailService mailService;
+    private MailService mailService;
 
     @Autowired
-    AuthTokenService authTokenService;
+    private AuthTokenService authTokenService;
 
     @Autowired
-    CacheService cacheService;
+    private CacheService cacheService;
 
     @PostMapping("/register")
     public Result register(@Validated @RequestBody RegDTO regDTO) throws MailCodeException {

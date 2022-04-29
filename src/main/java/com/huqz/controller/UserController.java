@@ -5,6 +5,7 @@ import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
 import com.huqz.exception.FileTypeException;
 import com.huqz.exception.MailCodeException;
+import com.huqz.model.ApiKey;
 import com.huqz.model.User;
 import com.huqz.pojo.imgDTO.FileDTO;
 import com.huqz.pojo.userDTO.MailDTO;
@@ -22,8 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -47,6 +48,12 @@ public class UserController {
 
     @Autowired
     private AuthTokenService authTokenService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private ApiKeyService apiKeyService;
 
 
     @GetMapping
@@ -179,4 +186,14 @@ public class UserController {
         return ResultGenerator.token("发送邮件成功", token);
     }
 
+    @GetMapping("/key")
+    public Result getApiKey() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+
+        List<ApiKey> keyList = apiKeyService.getByUserId(userId);
+        return ResultGenerator.ok(keyList);
+    }
 }

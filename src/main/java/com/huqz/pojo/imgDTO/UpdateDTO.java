@@ -10,8 +10,6 @@ import java.util.List;
 public class UpdateDTO {
 
     @NotEmpty
-    private Integer imgId;
-    @NotEmpty
     private Integer categoryId;
     @NotNull
     private List<String> tags;

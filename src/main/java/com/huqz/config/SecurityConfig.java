@@ -49,6 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/imgs/thumb/**");
         web.ignoring().antMatchers("/imgs/avatar/**");
         web.ignoring().antMatchers("/share/query/**");
+        web.ignoring().antMatchers("/fapi/**");
     }
 
     @Override

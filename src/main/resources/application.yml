@@ -34,11 +34,14 @@ spring:
     multipart:
       enabled: true
       max-file-size: 20MB
-
+  codec:
+    max-in-memory-size: 20MB
 mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 imgs:
   upload:

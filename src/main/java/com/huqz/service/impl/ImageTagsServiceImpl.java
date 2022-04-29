@@ -28,4 +28,12 @@ public class ImageTagsServiceImpl extends ServiceImpl<ImageTagsMapper, ImageTags
     public Boolean removeAllTagsByImgId(Integer imgId) {
         return imageTagsMapper.deleteAllTagsByImgId(imgId) > 0;
     }
+
+    @Override
+    public Boolean saveManyTags(Integer imgId, List<Integer> tagIds) {
+        for (Integer tagId : tagIds) {
+            imageTagsMapper.insert(new ImageTags().setImgId(imgId).setTagId(tagId));
+        }
+        return true;
+    }
 }

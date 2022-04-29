@@ -26,9 +26,18 @@ public class CheckUtils {
         return matcher.matches();
     }
 
+    public static boolean checkUrl(String url) {
+        String str = "^http(|s)://([\\w-:]+\\.)+[\\w-:]+(/[\\w-./?%&=]*)?$";
+        Pattern p = Pattern.compile(str);
+        Matcher matcher = p.matcher(url);
+        return matcher.matches();
+    }
+
     public static void main(String[] args) {
         System.out.println(checkMail("xx.xx@qq.com"));
         System.out.println(checkPassword("123-44_009ad"));
+        System.out.println(checkUrl("http://182.92.0.121:8001/images/2022/04/26/dSWoL.jpg"));
+        System.out.println(checkUrl("http://abs.cn/images/2022/04/26/dSWoL.jpg"));
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -84,5 +85,11 @@ public class GlobalExceptionHandler {
     public Result fileNotFoundException(FileNotFoundException fileNotFoundException) {
         fileNotFoundException.printStackTrace();
         return ResultGenerator.fail(ResultCode.NOT_FOUNT, "文件不存在");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException httpRequestMethodNotSupportedException) {
+        httpRequestMethodNotSupportedException.printStackTrace();
+        return ResultGenerator.fail(ResultCode.METHOD_NOT_ALLOWED, "不支持的请求方式");
     }
 }

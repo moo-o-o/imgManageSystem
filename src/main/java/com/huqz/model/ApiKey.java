@@ -5,14 +5,10 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
-public class AuthToken {
+public class ApiKey {
     private Integer id;
     private Integer userId;
+    private Integer categoryId;
     private String token;
-    private String osName;
-    private String browserName;
-    private String browserVersion;
-    private String expiration;
-    private String remark;
     private Timestamp createTime;
 }
