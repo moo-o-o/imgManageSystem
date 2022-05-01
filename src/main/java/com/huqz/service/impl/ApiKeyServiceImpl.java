@@ -24,4 +24,9 @@ public class ApiKeyServiceImpl extends ServiceImpl<ApiKeyMapper, ApiKey> impleme
     public ApiKey getByApiKey(String key) {
         return apiKeyMapper.selectByApiKey(key);
     }
+
+    @Override
+    public ApiKey getByUserIdAndApiKey(Integer userId, String key) {
+        return apiKeyMapper.selectByUserIdAndApiKey(userId, key);
+    }
 }

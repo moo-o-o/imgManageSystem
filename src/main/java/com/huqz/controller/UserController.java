@@ -196,4 +196,17 @@ public class UserController {
         List<ApiKey> keyList = apiKeyService.getByUserId(userId);
         return ResultGenerator.ok(keyList);
     }
+
+    @DeleteMapping("/key/{key}")
+    public Result removeApiKey(@PathVariable String key) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Integer userId = principal.getId();
+        ApiKey a = apiKeyService.getByUserIdAndApiKey(userId, key);
+        if (a == null) return ResultGenerator.ok();
+
+        apiKeyService.removeById(a.getId());
+        return ResultGenerator.ok();
+    }
 }

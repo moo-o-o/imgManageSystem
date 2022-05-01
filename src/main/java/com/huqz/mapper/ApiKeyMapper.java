@@ -17,4 +17,7 @@ public interface ApiKeyMapper extends BaseMapper<ApiKey> {
 
     @Select("select id, user_id, category_id, token, create_time from api_key where token = #{key}")
     ApiKey selectByApiKey(String key);
+
+    @Select("select id, user_id, category_id, token, create_time from api_key where user_id = #{userId} and token = #{key}")
+    ApiKey selectByUserIdAndApiKey(Integer userId, String key);
 }
