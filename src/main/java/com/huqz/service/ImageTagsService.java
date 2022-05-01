@@ -14,4 +14,8 @@ public interface ImageTagsService extends IService<ImageTags> {
     Boolean removeAllTagsByImgId(Integer imgId);
 
     Boolean saveManyTags(Integer imgId, List<Integer> tagIds);
+
+    List<Integer> getImgIdsByTagIds(List<Integer> tagIds);
+
+    List<Integer> getImgIdsByTagId(Integer tagId);
 }

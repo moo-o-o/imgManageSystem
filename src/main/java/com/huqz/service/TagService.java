@@ -17,4 +17,6 @@ public interface TagService extends IService<Tag> {
     List<String> getTagsByImgId(Integer imgId);
 
     List<Integer> saveMany(List<String> tags);
+
+    List<Integer> getIdsByPartTagName(String partTagName);
 }

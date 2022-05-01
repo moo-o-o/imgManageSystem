@@ -36,4 +36,14 @@ public class ImageTagsServiceImpl extends ServiceImpl<ImageTagsMapper, ImageTags
         }
         return true;
     }
+
+    @Override
+    public List<Integer> getImgIdsByTagIds(List<Integer> tagIds) {
+        return imageTagsMapper.selectImgIdsByTagIds(tagIds);
+    }
+
+    @Override
+    public List<Integer> getImgIdsByTagId(Integer tagId) {
+        return imageTagsMapper.selectImgIdsByTagId(tagId);
+    }
 }

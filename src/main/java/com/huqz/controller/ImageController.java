@@ -113,7 +113,9 @@ public class ImageController {
     public Result list(@RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
                        @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber,
                        @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId,
-                       @RequestParam(value = "tag", required = false) String tag) {
+                       @RequestParam(value = "tag", required = false) String tag,
+                       @RequestParam(value = "sort", defaultValue = "latest") String sort,
+                       @RequestParam(value = "diy", defaultValue = "false") Boolean diy) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -123,6 +125,8 @@ public class ImageController {
         pageDTO.setPageNumber(pageNumber);
         pageDTO.setCategoryId(categoryId);
         pageDTO.setTag(tag);
+        pageDTO.setSort(sort);
+        pageDTO.setDiy(diy);
 
         IPage<Image> page = imageService.getPageByAnyCondition(pageDTO, userId);
         return ResultGenerator.ok(page);

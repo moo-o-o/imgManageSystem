@@ -53,4 +53,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }
         return arr;
     }
+
+    @Override
+    public List<Integer> getIdsByPartTagName(String partTagName) {
+        return tagMapper.selectIdsByPartTagName(partTagName);
+    }
 }

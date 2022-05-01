@@ -20,4 +20,7 @@ public interface TagMapper extends BaseMapper<Tag> {
 
     @Select("SELECT tag_name FROM tag WHERE tag.id IN (SELECT tag_id FROM image_tags WHERE img_id = #{imgId})")
     List<String> selectTagsByImgId(Integer imgId);
+
+    @Select("select id from tag where tag_name like CONCAT(#{partTagName},'%')")
+    List<Integer> selectIdsByPartTagName(String partTagName);
 }

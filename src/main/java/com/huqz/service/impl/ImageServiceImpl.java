@@ -8,10 +8,12 @@ import com.huqz.mapper.ImageMapper;
 import com.huqz.model.Image;
 import com.huqz.pojo.imgDTO.PageDTO;
 import com.huqz.service.ImageService;
+import com.huqz.service.ImageTagsService;
 import com.huqz.service.TagService;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -24,6 +26,9 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private ImageTagsService imageTagsService;
+
     @Override
     public IPage<Image> getPageByAnyCondition(PageDTO pageDTO, Integer userId) {
 
@@ -31,11 +36,28 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         lqw.eq(Image::getUserId, userId);
         lqw.eq(pageDTO.getCategoryId() != 0, Image::getCategoryId, pageDTO.getCategoryId());
 
-        // 根据tagName查询tagId
-        Integer tagId = tagService.getIdByTagName(pageDTO.getTag());
+        List<Integer> imgIds = null;
 
-        // 剔除掉没有tagId的图片
-        lqw.inSql(tagId != null, Image::getId, "select img_id from image_tags where tag_id = " + tagId);
+        // 筛选标签
+        if (pageDTO.getTag() != null) {
+
+            if (pageDTO.getDiy()) {
+                // 用户输入的标签（可能不完整
+                List<Integer> tagIds = tagService.getIdsByPartTagName(pageDTO.getTag());
+                imgIds = imageTagsService.getImgIdsByTagIds(tagIds);
+            } else {
+                // 已存在的完整标签名字
+                Integer tagId = tagService.getIdByTagName(pageDTO.getTag());
+                imgIds = imageTagsService.getImgIdsByTagId(tagId);
+            }
+            System.out.println("@@@" + imgIds);
+            lqw.in(imgIds != null && imgIds.size() > 0, Image::getId, imgIds);
+        }
+
+        // 排序
+        lqw.orderBy("oldest".equals(pageDTO.getSort()), true, Image::getCreateTime);
+        lqw.orderBy("latest".equals(pageDTO.getSort()), false, Image::getCreateTime);
+//        lqw.orderBy("popular".equals(pageDTO.getSort()), false, Image::getCreateTime);
 
         IPage<Image> page = new Page<>(pageDTO.getPageNumber(), pageDTO.getPageSize());
         imageMapper.selectPage(page, lqw);

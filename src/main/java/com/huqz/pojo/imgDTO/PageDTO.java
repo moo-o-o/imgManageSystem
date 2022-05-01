@@ -15,4 +15,6 @@ public class PageDTO {
     private Integer pageNumber;
     private Integer categoryId;
     private String tag;
+    private String sort;
+    private Boolean diy;
 }

@@ -21,4 +21,9 @@ public interface ImageTagsMapper extends BaseMapper<ImageTags> {
 
     @Delete("delete from image_tags where img_id = #{imgId}")
     int deleteAllTagsByImgId(Integer imgId);
+
+    List<Integer> selectImgIdsByTagIds(List<Integer> tagIds);
+
+    @Select("select img_id from image_tags where tag_id = #{tagId}")
+    List<Integer> selectImgIdsByTagId(Integer tagId);
 }
