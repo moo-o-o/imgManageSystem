@@ -3,6 +3,7 @@ package com.huqz.utils;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
+import java.util.UUID;
 
 @Component
 public class CodeUtils {
@@ -16,6 +17,11 @@ public class CodeUtils {
             sb.append(num);
         }
         return sb.toString();
+    }
+
+    public String genShareCode() {
+        String s = UUID.randomUUID().toString().replaceAll("-", "");
+        return s.substring(28);
     }
 
     public static void main(String[] args) {

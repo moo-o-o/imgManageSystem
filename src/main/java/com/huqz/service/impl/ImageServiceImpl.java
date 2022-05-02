@@ -57,7 +57,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         // 排序
         lqw.orderBy("oldest".equals(pageDTO.getSort()), true, Image::getCreateTime);
         lqw.orderBy("latest".equals(pageDTO.getSort()), false, Image::getCreateTime);
-//        lqw.orderBy("popular".equals(pageDTO.getSort()), false, Image::getCreateTime);
+        lqw.orderBy("popular".equals(pageDTO.getSort()), false, Image::getVisit);
 
         IPage<Image> page = new Page<>(pageDTO.getPageNumber(), pageDTO.getPageSize());
         imageMapper.selectPage(page, lqw);
@@ -107,5 +107,10 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     @Override
     public String getUrlByThumbUrn(String thumbUrn) {
         return imageMapper.selectUrlByThumbUrn(thumbUrn);
+    }
+
+    @Override
+    public Image getByUrn(String urn) {
+        return imageMapper.selectByUrn(urn);
     }
 }

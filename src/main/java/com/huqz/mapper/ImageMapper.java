@@ -35,5 +35,6 @@ public interface ImageMapper extends BaseMapper<Image> {
     @Select("select url from image where thumb_urn = #{thumbUrn}")
     String selectUrlByThumbUrn(String thumbUrn);
 
-
+    @Select("select * from image where urn = #{urn}")
+    Image selectByUrn(String urn);
 }

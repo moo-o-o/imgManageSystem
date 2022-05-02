@@ -12,15 +12,18 @@ import com.huqz.pojo.imgDTO.UpdateDTO;
 import com.huqz.pojo.imgDTO.UploadDTO;
 import com.huqz.service.*;
 import com.huqz.utils.FilesUtils;
+import com.huqz.utils.IpUtils;
 import com.huqz.utils.UrnUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,6 +59,9 @@ public class ImageController {
 
     @Value("${imgs.view.notFound}")
     private String notFoundImage;
+
+    @Autowired
+    private CacheService cacheService;
 
     @PostMapping
     public Result upload(UploadDTO uploadDTO, @RequestParam("file") MultipartFile file) throws FileTypeException, IOException {
@@ -204,11 +210,23 @@ public class ImageController {
 
     @GetMapping(value = "/view/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
-    public byte[] view(@PathVariable String urn) throws IOException {
+    public byte[] view(@PathVariable String urn, HttpServletRequest request) throws Exception {
 
+        String ip = IpUtils.getIpAddr(request);
         String path = notFoundImage;
-        String url = imageService.getUrlByUrn(urn);
+//        String url = imageService.getUrlByUrn(urn);
+        Image image = imageService.getByUrn(urn);
+        String url = image.getUrl();
         if (url != null) path = filesUtils.getAbsolutePath(url);
+
+        // 访问次数
+        try {
+            cacheService.getVisit(ip, image.getId());
+        }catch (Exception e) {
+            cacheService.storeVisit(ip, image.getId());
+            image.setVisit(image.getVisit() + 1);
+            imageService.updateById(image);
+        }
 
         FileInputStream fis = new FileInputStream(new File(path));
         byte[] bytes = new byte[fis.available()];
@@ -218,13 +236,27 @@ public class ImageController {
 
     @GetMapping(value = "/view/share/{urn}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
-    public byte[] viewShare(@PathVariable String urn) throws IOException {
+    public byte[] viewShare(@PathVariable String urn, HttpServletRequest request) throws IOException {
+
+        String ip = IpUtils.getIpAddr(request);
 
         String path = notFoundImage;
         if (urn.length() == 32) {
             ShareImage shareImage = shareImageService.getImageByUrn(urn);
             if (shareImage != null && shareImage.getStatus()) {
-                String url = imageService.getUrlByImgId(shareImage.getImgId());
+//                String url = imageService.getUrlByImgId(shareImage.getImgId());
+                Image image = imageService.getById(shareImage.getImgId());
+
+                // 访问次数
+                try {
+                    cacheService.getVisit(ip, image.getId());
+                }catch (Exception e) {
+                    cacheService.storeVisit(ip, image.getId());
+                    image.setVisit(image.getVisit() + 1);
+                    imageService.updateById(image);
+                }
+
+                String url = image.getUrl();
                 path = filesUtils.getAbsolutePath(url);
             }
         }

@@ -5,6 +5,7 @@ import com.huqz.core.ResultCode;
 import com.huqz.core.ResultGenerator;
 import com.huqz.model.*;
 import com.huqz.service.*;
+import com.huqz.utils.CodeUtils;
 import com.huqz.utils.DesensitizedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -36,6 +39,12 @@ public class ShareController {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private CodeUtils codeUtils;
+
+    @Autowired
+    private AuthTokenService authTokenService;
+
     private final String SHARE_PREFIX = "?shareId=";
 
     @GetMapping
@@ -49,19 +58,26 @@ public class ShareController {
         return ResultGenerator.ok(res);
     }
 
-    @PostMapping
-    public Result createShare(@RequestBody Map<String, Integer> map) {
+    @PostMapping("{categoryId}")
+    public Result createShare(@PathVariable Integer categoryId, @RequestBody Map<String, Object> map) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
         Integer userId = principal.getId();
-        Integer categoryId = map.get("categoryId");
+
+        String time = (String) map.get("time");
+        Timestamp shareTime = getExpireDay(time);
+        Boolean code = (Boolean) map.get("code");  // todo 校验
+        String description = (String) map.get("description");
+
         if (categoryId == null) return ResultGenerator.fail(ResultCode.INVALID_ARGS, "不合法的参数");
 
-        Category category = categoryService.getByCategoryIdAndUserId(categoryId, userId);
-        if (category == null) return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "无效的categoryId");
+        if (categoryId != 1) {
+            Category category = categoryService.getByCategoryIdAndUserId(categoryId, userId);
+            if (category == null) return ResultGenerator.fail(ResultCode.UNKNOWN_CATEGORY_ID, "无效的categoryId");
+        }
 
-        if (category.getShared()) return ResultGenerator.fail(ResultCode.SHARED_CATEGORY_ID, "该分类已经分享");
+//        if (category.getShared()) return ResultGenerator.fail(ResultCode.SHARED_CATEGORY_ID, "该分类已经分享");
 
         // 查询在该分类下是否有图片
         List<Image> images = imageService.getImageByUserIdAndCategoryId(userId, categoryId);
@@ -69,15 +85,24 @@ public class ShareController {
 
         // 新建分享分类
         ShareList shareList = new ShareList();
-        shareList.setCategoryId(categoryId);
+        shareList.setId(authTokenService.genToken());
         shareList.setUserId(userId);
+        shareList.setCategoryId(categoryId);
         shareList.setType("category");
+        if (code) shareList.setCode(codeUtils.genShareCode());
+        if (shareTime != null) {
+            shareList.setExpireTime(shareTime);
+        }
+        if (description != null && !"".equals(description)) {
+            shareList.setDescription(description);
+        }
+
         // 保存分享
         shareListService.save(shareList);
         // 给当前类设置分享属性
-        category.setShared(true);
-        category.setShareId(shareList.getId());
-        categoryService.updateById(category);
+//        category.setShared(true);
+//        category.setShareId(shareList.getId());
+//        categoryService.updateById(category);
 
         // todo 感觉要是某个分类图片很多的话，对数据库打击就很大了
         for (Image image : images) {
@@ -94,13 +119,14 @@ public class ShareController {
         Map<String, Object> res = new HashMap<>();
         res.put("shareId", shareList.getId());
         res.put("url", SHARE_PREFIX + shareList.getId());
+        res.put("code", shareList.getCode());
 
         return ResultGenerator.ok(res);
 
     }
 
     @DeleteMapping("{shareId}")
-    public Result deleteShare(@PathVariable("shareId")String shareId) {
+    public Result deleteShare(@PathVariable("shareId") String shareId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
 
@@ -112,16 +138,18 @@ public class ShareController {
         // 该用户不存在该分享ID
         if (shareList == null) return ResultGenerator.ok();
 
-        if (!shareList.getStatus()) return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
+//        if (!shareList.getStatus()) return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
+
 
         // 设置已分享的图片 分享状态为 false
         shareImageService.updateStatusManyByShareId(shareId, false);
         // 移除 category 库该分类的 shareId
-        if ("category".equals(shareList.getType())) {
-            categoryService.cancelShareByCategoryId(shareList.getCategoryId());
-        }
+//        if ("category".equals(shareList.getType())) {
+//            categoryService.cancelShareByCategoryId(shareList.getCategoryId());
+//        }
         // 设置该shareId的状态为false
-        shareListService.cancelShareById(shareList.getId());
+//        shareListService.cancelShareById(shareList.getId());
+        shareListService.removeById(shareId);
 
         return ResultGenerator.ok();
     }
@@ -133,6 +161,16 @@ public class ShareController {
         if (shareList == null) return ResultGenerator.fail(ResultCode.INVALID_SHARE_ID, "无效的shareId");
 
         if (!shareList.getStatus()) return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
+
+        Timestamp expireTime = shareList.getExpireTime();
+        if (expireTime != null) {
+            if (new Date(expireTime.getTime()).before(new Date())){
+                shareListService.cancelShareById(shareId);
+                // 设置已分享的图片 分享状态为 false
+                shareImageService.updateStatusManyByShareId(shareId, false);
+                return ResultGenerator.fail(ResultCode.EXPIRED_SHARE, "该分享已失效");
+            }
+        }
 
         User shareUser = userService.getById(shareList.getUserId());
         String nickname = shareUser.getNickname();
@@ -157,6 +195,19 @@ public class ShareController {
 
         return ResultGenerator.ok(map);
 
+
+    }
+
+    public Timestamp getExpireDay(String s) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        int day = 30;
+        if ("day".equals(s)) day = 1;
+        else if ("week".equals(s)) day = 7;
+        else if ("permanent".equals(s)) return null;
+
+        calendar.add(Calendar.DATE, day);
+        return new Timestamp(calendar.getTime().getTime());
 
     }
 

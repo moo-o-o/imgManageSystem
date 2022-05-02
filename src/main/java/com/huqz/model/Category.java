@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 public class Category {
     private Integer id;
     private String categoryName;
-    private String shareId;
-    private Boolean shared;
+//    private String shareId;
+//    private Boolean shared;
     private Integer userId;
     private Timestamp createTime;
 

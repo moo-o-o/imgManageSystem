@@ -10,4 +10,8 @@ public interface CacheService {
     MailDTO getByToken(String token) throws MailCodeException;
 
     void delMailCode(String token);
+
+    Boolean storeVisit(String ip, Integer imgId);
+
+    Boolean getVisit(String ip, Integer imgId) throws Exception;
 }

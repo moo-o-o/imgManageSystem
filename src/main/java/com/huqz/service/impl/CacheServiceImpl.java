@@ -3,6 +3,7 @@ package com.huqz.service.impl;
 import com.huqz.pojo.userDTO.MailDTO;
 import com.huqz.exception.MailCodeException;
 import com.huqz.service.CacheService;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,4 +33,16 @@ public class CacheServiceImpl implements CacheService {
     @Override
     @CacheEvict(value = "mailCode", key = "#token")
     public void delMailCode(String token) {}
+
+    @CachePut(value = "visit#86400", key = "#ip + '::' + #imgId")
+    public Boolean storeVisit(String ip, Integer imgId) {
+        System.out.println(ip + "@@@" + imgId);
+        return true;
+    }
+
+    @Cacheable(value = "visit", key = "#ip + '::' + #imgId")
+    public Boolean getVisit(String ip, Integer imgId) throws Exception {
+        System.out.println(ip + "$$$" + imgId);
+        throw new Exception();
+    }
 }

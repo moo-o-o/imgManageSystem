@@ -18,6 +18,7 @@ public class Image {
     private String thumbUrn;
     private Integer categoryId;
     private String status;
+    private Integer visit;
     private String confirm;
     private Timestamp createTime;
 

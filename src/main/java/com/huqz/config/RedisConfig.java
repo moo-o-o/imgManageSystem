@@ -2,15 +2,20 @@ package com.huqz.config;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
+@EnableCaching
 @Configuration
 public class RedisConfig extends CachingConfigurerSupport {
 
@@ -26,7 +31,10 @@ public class RedisConfig extends CachingConfigurerSupport {
                 )
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(genericJackson2JsonRedisSerializer)
-                );
-        return RedisCacheManager.builder(factory).cacheDefaults(redisCacheConfiguration).build();
+                )
+                .entryTtl(Duration.ofMinutes(15))  // 默认15分钟
+                .computePrefixWith(cacheName -> "imgs_" + cacheName);
+
+        return new MyRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(factory), redisCacheConfiguration);
     }
 }
